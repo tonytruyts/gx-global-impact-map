@@ -1,0 +1,1 @@
+# gx-global-impact-map
