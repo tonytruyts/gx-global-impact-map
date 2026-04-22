@@ -1,11 +1,16 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import Globe from "react-globe.gl";
 
-const gxColors = {
+const GX = {
   orange: "#F4601A",
   black: "#0D0D0D",
   offWhite: "#FAFAF8",
   warmGray: "#F0EDE8",
+  softText: "rgba(250,250,248,0.72)",
+  softerText: "rgba(250,250,248,0.52)",
+  border: "rgba(255,255,255,0.10)",
+  panel: "rgba(255,255,255,0.04)",
+  panelStrong: "rgba(255,255,255,0.06)",
   live: "#6EF3A5",
   recent: "#FAFAF8",
   historic: "#87A8FF",
@@ -343,9 +348,9 @@ const testimonials = [
 ];
 
 function getPointColor(status) {
-  if (status === "live") return gxColors.live;
-  if (status === "recent") return gxColors.recent;
-  return gxColors.historic;
+  if (status === "live") return GX.live;
+  if (status === "recent") return GX.recent;
+  return GX.historic;
 }
 
 function getFilterMatch(item, activeFilter) {
@@ -362,14 +367,14 @@ function createFallbackImage(label) {
     <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700">
       <defs>
         <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
-          <stop offset="0%" stop-color="#1c1c1c"/>
-          <stop offset="100%" stop-color="#0d0d0d"/>
+          <stop offset="0%" stop-color="#1b1b1b"/>
+          <stop offset="100%" stop-color="#0D0D0D"/>
         </linearGradient>
       </defs>
       <rect width="100%" height="100%" fill="url(#g)"/>
-      <circle cx="1020" cy="120" r="160" fill="rgba(244,96,26,0.25)"/>
-      <text x="70" y="330" fill="#FAFAF8" font-size="64" font-family="Arial, sans-serif" font-weight="700">${label}</text>
-      <text x="70" y="395" fill="#F4601A" font-size="28" font-family="Arial, sans-serif">GX International</text>
+      <circle cx="1010" cy="120" r="160" fill="rgba(244,96,26,0.24)"/>
+      <text x="68" y="330" fill="#FAFAF8" font-size="64" font-family="Arial, sans-serif" font-weight="700">${label}</text>
+      <text x="68" y="390" fill="#F4601A" font-size="28" font-family="Arial, sans-serif">GX International</text>
     </svg>
   `;
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
@@ -379,15 +384,13 @@ function useCountUp(target, duration = 1400) {
   const [value, setValue] = useState(0);
 
   useEffect(() => {
-    let start = 0;
     let frameId;
-    const startTime = performance.now();
+    const start = performance.now();
 
     const tick = (now) => {
-      const progress = Math.min((now - startTime) / duration, 1);
+      const progress = Math.min((now - start) / duration, 1);
       const eased = 1 - Math.pow(1 - progress, 3);
-      start = Math.round(target * eased);
-      setValue(start);
+      setValue(Math.round(target * eased));
       if (progress < 1) frameId = requestAnimationFrame(tick);
     };
 
@@ -401,18 +404,18 @@ function useCountUp(target, duration = 1400) {
 function CountCard({ label, target }) {
   const value = useCountUp(target);
   return (
-    <div style={styles.statCard}>
-      <div style={styles.statLabel}>{label}</div>
-      <div style={styles.statValue}>{value.toLocaleString()}</div>
+    <div className="gx-stat-card">
+      <div className="gx-stat-label">{label}</div>
+      <div className="gx-stat-value">{value.toLocaleString()}</div>
     </div>
   );
 }
 
 function MiniMetric({ label, value }) {
   return (
-    <div style={styles.metricCard}>
-      <div style={styles.metricLabel}>{label}</div>
-      <div style={styles.metricValue}>{value.toLocaleString()}</div>
+    <div className="gx-mini-metric">
+      <div className="gx-mini-label">{label}</div>
+      <div className="gx-mini-value">{value.toLocaleString()}</div>
     </div>
   );
 }
@@ -428,11 +431,612 @@ function TestimonialSlider() {
   }, []);
 
   return (
-    <div style={styles.testimonialCard}>
-      <div style={styles.cardLabel}>LIVE TESTIMONIES</div>
-      <p style={styles.testimonialQuote}>“{testimonials[index].quote}”</p>
-      <div style={styles.testimonialPlace}>{testimonials[index].place}</div>
+    <div className="gx-testimonial-card">
+      <div className="gx-eyebrow">LIVE TESTIMONIES</div>
+      <p className="gx-testimonial-quote">“{testimonials[index].quote}”</p>
+      <div className="gx-testimonial-place">{testimonials[index].place}</div>
     </div>
+  );
+}
+
+function GlobalStyles() {
+  return (
+    <style>{`
+      * { box-sizing: border-box; }
+      html, body, #root { margin: 0; min-height: 100%; background: #0D0D0D; }
+      button { font: inherit; }
+
+      @keyframes gxPulse {
+        0% { transform: translate(-50%, -50%) scale(0.96); opacity: 0.65; }
+        50% { transform: translate(-50%, -50%) scale(1.04); opacity: 1; }
+        100% { transform: translate(-50%, -50%) scale(0.96); opacity: 0.65; }
+      }
+
+      @keyframes gxFloat {
+        0% { transform: translateY(0px); opacity: 0.35; }
+        50% { transform: translateY(-14px); opacity: 0.8; }
+        100% { transform: translateY(0px); opacity: 0.35; }
+      }
+
+      .gx-page {
+        min-height: 100vh;
+        background:
+          radial-gradient(circle at 15% 10%, rgba(244,96,26,0.12), transparent 18%),
+          radial-gradient(circle at 86% 22%, rgba(244,96,26,0.08), transparent 22%),
+          #0D0D0D;
+        color: #FAFAF8;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .gx-glow-left {
+        position: absolute;
+        top: -180px;
+        left: -140px;
+        width: 520px;
+        height: 520px;
+        border-radius: 50%;
+        background: rgba(244,96,26,0.14);
+        filter: blur(120px);
+        pointer-events: none;
+      }
+
+      .gx-glow-right {
+        position: absolute;
+        top: 120px;
+        right: -180px;
+        width: 560px;
+        height: 560px;
+        border-radius: 50%;
+        background: rgba(244,96,26,0.08);
+        filter: blur(130px);
+        pointer-events: none;
+      }
+
+      .gx-particles {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        overflow: hidden;
+        z-index: 1;
+      }
+
+      .gx-particle {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: rgba(250,250,248,0.18);
+        box-shadow: 0 0 10px rgba(244,96,26,0.35);
+        animation: gxFloat 9s ease-in-out infinite;
+      }
+
+      .gx-container {
+        width: min(1480px, calc(100% - 40px));
+        margin: 0 auto;
+        position: relative;
+        z-index: 2;
+      }
+
+      .gx-hero {
+        padding: 52px 0 24px;
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 24px;
+        align-items: end;
+      }
+
+      .gx-eyebrow {
+        font-size: 12px;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: rgba(250,250,248,0.55);
+        margin-bottom: 14px;
+      }
+
+      .gx-hero-title {
+        margin: 0;
+        font-size: clamp(56px, 7vw, 102px);
+        line-height: 0.9;
+        letter-spacing: -0.07em;
+        white-space: normal;
+      }
+
+      .gx-hero-line {
+        display: block;
+        color: #FAFAF8;
+      }
+
+      .gx-hero-line-muted {
+        display: block;
+        color: rgba(250,250,248,0.62);
+      }
+
+      .gx-hero-text {
+        margin-top: 22px;
+        max-width: 860px;
+        color: rgba(250,250,248,0.8);
+        font-size: 18px;
+        line-height: 1.8;
+      }
+
+      .gx-button-row {
+        margin-top: 24px;
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .gx-primary-btn,
+      .gx-secondary-btn,
+      .gx-filter-btn,
+      .gx-drawer-toggle,
+      .gx-location-btn {
+        appearance: none;
+        outline: none;
+      }
+
+      .gx-primary-btn {
+        background: #F4601A;
+        color: #FAFAF8;
+        border: 1px solid rgba(255,255,255,0.10);
+        border-radius: 18px;
+        padding: 14px 18px;
+        cursor: pointer;
+        font-weight: 700;
+      }
+
+      .gx-secondary-btn {
+        background: rgba(255,255,255,0.05);
+        color: #FAFAF8;
+        border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 18px;
+        padding: 14px 18px;
+        cursor: pointer;
+        font-weight: 700;
+      }
+
+      .gx-hero-card,
+      .gx-drawer,
+      .gx-bottom-card,
+      .gx-testimonial-card,
+      .gx-stat-card {
+        background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+        border: 1px solid rgba(255,255,255,0.10);
+        box-shadow: 0 0 40px rgba(244,96,26,0.06);
+      }
+
+      .gx-hero-card {
+        border-radius: 28px;
+        padding: 24px;
+        backdrop-filter: blur(18px);
+      }
+
+      .gx-card-title {
+        margin: 0;
+        font-size: 34px;
+        letter-spacing: -0.03em;
+      }
+
+      .gx-card-sub {
+        margin-top: 8px;
+        margin-bottom: 14px;
+        color: rgba(250,250,248,0.68);
+      }
+
+      .gx-card-text {
+        color: rgba(250,250,248,0.82);
+        line-height: 1.72;
+        font-size: 16px;
+      }
+
+      .gx-tag-row {
+        margin-top: 16px;
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .gx-tag {
+        border-radius: 999px;
+        padding: 8px 12px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.05);
+        color: #FAFAF8;
+        font-size: 12px;
+        text-transform: capitalize;
+      }
+
+      .gx-stats {
+        padding: 8px 0 22px;
+      }
+
+      .gx-stats-grid {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 12px;
+      }
+
+      .gx-stat-card {
+        border-radius: 22px;
+        padding: 18px;
+        min-height: 108px;
+      }
+
+      .gx-stat-label {
+        color: rgba(250,250,248,0.54);
+        font-size: 13px;
+        margin-bottom: 10px;
+      }
+
+      .gx-stat-value {
+        font-size: 34px;
+        font-weight: 700;
+        letter-spacing: -0.04em;
+      }
+
+      .gx-globe-section {
+        padding-bottom: 30px;
+      }
+
+      .gx-globe-header {
+        display: flex;
+        justify-content: space-between;
+        gap: 18px;
+        align-items: flex-end;
+        margin-bottom: 18px;
+      }
+
+      .gx-globe-title {
+        margin: 0;
+        font-size: 44px;
+        letter-spacing: -0.04em;
+      }
+
+      .gx-globe-text {
+        color: rgba(250,250,248,0.74);
+        line-height: 1.7;
+        max-width: 760px;
+        margin-top: 12px;
+      }
+
+      .gx-filter-row {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .gx-filter-btn {
+        border-radius: 999px;
+        padding: 10px 14px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.05);
+        color: #FAFAF8;
+        cursor: pointer;
+      }
+
+      .gx-filter-btn.active {
+        background: #F4601A;
+        color: #FAFAF8;
+        border-color: rgba(255,255,255,0.08);
+      }
+
+      .gx-globe-wrap {
+        display: grid;
+        grid-template-columns: 1.22fr 0.78fr;
+        gap: 18px;
+        align-items: stretch;
+      }
+
+      .gx-globe-card {
+        min-height: 820px;
+        border-radius: 30px;
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: radial-gradient(circle at center, rgba(244,96,26,0.16), rgba(255,255,255,0.06) 36%, rgba(255,255,255,0.02) 62%);
+        backdrop-filter: blur(20px);
+        box-shadow: 0 0 80px rgba(244,96,26,0.12);
+        position: relative;
+      }
+
+      .gx-globe-aura {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 520px;
+        height: 520px;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        background: rgba(244,96,26,0.18);
+        filter: blur(100px);
+        pointer-events: none;
+        z-index: 0;
+        animation: gxPulse 5.2s ease-in-out infinite;
+      }
+
+      .gx-drawer {
+        border-radius: 30px;
+        padding: 22px;
+        transition: all 0.3s ease;
+        overflow: hidden;
+        backdrop-filter: blur(18px);
+      }
+
+      .gx-drawer.open {
+        opacity: 1;
+        transform: translateX(0);
+      }
+
+      .gx-drawer.closed {
+        opacity: 0.92;
+        transform: translateX(6px);
+      }
+
+      .gx-drawer-top {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: flex-start;
+      }
+
+      .gx-drawer-title {
+        margin: 0;
+        font-size: 36px;
+        letter-spacing: -0.03em;
+      }
+
+      .gx-drawer-sub {
+        margin-top: 8px;
+        color: rgba(250,250,248,0.7);
+      }
+
+      .gx-drawer-toggle {
+        border-radius: 14px;
+        border: 1px solid rgba(255,255,255,0.10);
+        background: rgba(255,255,255,0.05);
+        color: #FAFAF8;
+        padding: 10px 12px;
+        cursor: pointer;
+      }
+
+      .gx-cover {
+        width: 100%;
+        height: 240px;
+        object-fit: cover;
+        border-radius: 22px;
+        margin-top: 18px;
+        border: 1px solid rgba(255,255,255,0.08);
+        background: #181818;
+      }
+
+      .gx-metrics-grid {
+        margin-top: 18px;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+      }
+
+      .gx-mini-metric {
+        border-radius: 18px;
+        border: 1px solid rgba(255,255,255,0.10);
+        background: rgba(0,0,0,0.18);
+        padding: 14px;
+      }
+
+      .gx-mini-label {
+        color: rgba(250,250,248,0.48);
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        margin-bottom: 10px;
+      }
+
+      .gx-mini-value {
+        font-size: 26px;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+      }
+
+      .gx-section-block {
+        margin-top: 22px;
+      }
+
+      .gx-bullet-list {
+        display: grid;
+        gap: 12px;
+        margin-top: 14px;
+      }
+
+      .gx-bullet-row {
+        display: flex;
+        gap: 10px;
+        color: rgba(250,250,248,0.82);
+        line-height: 1.6;
+        align-items: flex-start;
+      }
+
+      .gx-bullet-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: #F4601A;
+        margin-top: 9px;
+        flex-shrink: 0;
+      }
+
+      .gx-location-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 14px;
+        max-height: 320px;
+        overflow-y: auto;
+        padding-right: 4px;
+      }
+
+      .gx-location-btn {
+        width: 100%;
+        border-radius: 18px;
+        border: 1px solid rgba(255,255,255,0.10);
+        background: rgba(255,255,255,0.03);
+        color: #FAFAF8;
+        padding: 14px;
+        cursor: pointer;
+        text-align: left;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .gx-location-btn.active {
+        background: rgba(244,96,26,0.12);
+        border-color: rgba(244,96,26,0.28);
+      }
+
+      .gx-location-name {
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+
+      .gx-location-meta {
+        color: rgba(250,250,248,0.52);
+        font-size: 13px;
+      }
+
+      .gx-location-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        flex-shrink: 0;
+      }
+
+      .gx-testimonial-wrap {
+        margin-top: 18px;
+      }
+
+      .gx-testimonial-card {
+        border-radius: 24px;
+        padding: 24px;
+      }
+
+      .gx-testimonial-quote {
+        margin: 0;
+        font-size: 24px;
+        line-height: 1.6;
+        color: #FAFAF8;
+        max-width: 980px;
+      }
+
+      .gx-testimonial-place {
+        margin-top: 14px;
+        color: #F4601A;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+      }
+
+      .gx-bottom {
+        padding-bottom: 60px;
+      }
+
+      .gx-bottom-card {
+        border-radius: 28px;
+        padding: 28px;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 20px;
+        align-items: center;
+      }
+
+      .gx-bottom-title {
+        margin: 0;
+        font-size: 42px;
+        letter-spacing: -0.04em;
+      }
+
+      .gx-bottom-text {
+        margin-top: 14px;
+        color: rgba(250,250,248,0.76);
+        line-height: 1.7;
+        max-width: 780px;
+      }
+
+      @media (max-width: 1280px) {
+        .gx-stats-grid {
+          grid-template-columns: repeat(3, 1fr);
+        }
+
+        .gx-globe-wrap {
+          grid-template-columns: 1fr;
+        }
+
+        .gx-globe-card {
+          min-height: 720px;
+        }
+      }
+
+      @media (max-width: 980px) {
+        .gx-hero {
+          grid-template-columns: 1fr;
+        }
+
+        .gx-globe-header {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .gx-bottom-card {
+          grid-template-columns: 1fr;
+        }
+
+        .gx-hero-title {
+          font-size: clamp(44px, 12vw, 72px);
+        }
+      }
+
+      @media (max-width: 720px) {
+        .gx-container {
+          width: min(100% - 24px, 1480px);
+        }
+
+        .gx-stats-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .gx-metrics-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .gx-globe-card {
+          min-height: 560px;
+        }
+
+        .gx-drawer-title,
+        .gx-card-title {
+          font-size: 28px;
+        }
+
+        .gx-globe-title,
+        .gx-bottom-title {
+          font-size: 32px;
+        }
+
+        .gx-testimonial-quote {
+          font-size: 20px;
+        }
+      }
+
+      @media (max-width: 520px) {
+        .gx-stats-grid,
+        .gx-metrics-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .gx-globe-card {
+          min-height: 500px;
+        }
+      }
+    `}</style>
   );
 }
 
@@ -465,7 +1069,7 @@ export default function App() {
         startLng: kc.lng,
         endLat: item.lat,
         endLng: item.lng,
-        color: [gxColors.orange, gxColors.orange],
+        color: [GX.orange, GX.orange],
       }));
   }, []);
 
@@ -473,16 +1077,10 @@ export default function App() {
     return {
       locations: locations.length,
       liveNow: locations.filter((item) => item.status === "live").length,
-      heardGospel: locations.reduce(
-        (sum, item) => sum + item.stats.heardGospel,
-        0
-      ),
+      heardGospel: locations.reduce((sum, item) => sum + item.stats.heardGospel, 0),
       salvations: locations.reduce((sum, item) => sum + item.stats.salvations, 0),
       healings: locations.reduce((sum, item) => sum + item.stats.healings, 0),
-      testimonies: locations.reduce(
-        (sum, item) => sum + item.stats.testimonies,
-        0
-      ),
+      testimonies: locations.reduce((sum, item) => sum + item.stats.testimonies, 0),
     };
   }, []);
 
@@ -510,15 +1108,18 @@ export default function App() {
   };
 
   return (
-    <div style={styles.page}>
-      <div style={styles.backgroundGlowLeft}></div>
-      <div style={styles.backgroundGlowRight}></div>
-      <div style={styles.particlesLayer}>
+    <div className="gx-page">
+      <GlobalStyles />
+
+      <div className="gx-glow-left"></div>
+      <div className="gx-glow-right"></div>
+
+      <div className="gx-particles">
         {Array.from({ length: 22 }).map((_, i) => (
           <span
             key={i}
+            className="gx-particle"
             style={{
-              ...styles.particle,
               left: `${(i * 4.3) % 96}%`,
               top: `${(i * 13.7) % 88}%`,
               animationDelay: `${i * 0.4}s`,
@@ -527,50 +1128,48 @@ export default function App() {
         ))}
       </div>
 
-      <section style={styles.heroSection}>
-        <div style={styles.container}>
-          <div style={styles.heroGrid}>
-            <div>
-              <div style={styles.eyebrow}>GX INTERNATIONAL · GLOBAL MOVEMENT</div>
-              <h1 style={styles.heroTitle}>
-                REACHING THE LOST{"\n"}
-                <span style={styles.heroTitleSoft}>NO MATTER THE COST</span>
-              </h1>
-              <p style={styles.heroText}>
-                A living global experience of where GX has been, where teams are
-                active now, and where the gospel is moving through outreach,
-                training, discipleship and mission.
-              </p>
+      <div className="gx-container">
+        <section className="gx-hero">
+          <div>
+            <div className="gx-eyebrow">GX INTERNATIONAL · GLOBAL MOVEMENT</div>
 
-              <div style={styles.buttonRow}>
-                <button style={styles.primaryButton}>Explore the Movement</button>
-                <button style={styles.secondaryButton}>Become a Partner</button>
-              </div>
-            </div>
+            <h1 className="gx-hero-title">
+              <span className="gx-hero-line">REACHING THE LOST</span>
+              <span className="gx-hero-line-muted">NO MATTER THE COST</span>
+            </h1>
 
-            <div style={styles.heroInfoCard}>
-              <div style={styles.cardLabel}>LIVE FOCUS</div>
-              <h3 style={styles.cardTitle}>{selected.city}</h3>
-              <p style={styles.cardSub}>
-                {selected.country} · {selected.region}
-              </p>
-              <p style={styles.cardText}>{selected.summary}</p>
+            <p className="gx-hero-text">
+              A living global experience of where GX has been, where teams are
+              active now, and where the gospel is moving through outreach,
+              training, discipleship and mission.
+            </p>
 
-              <div style={styles.tagRow}>
-                <span style={styles.tag}>{selected.year}</span>
-                <span style={styles.tag}>{selected.type}</span>
-                <span style={styles.tag}>
-                  {selected.status === "live" ? "Live Now" : selected.status}
-                </span>
-              </div>
+            <div className="gx-button-row">
+              <button className="gx-primary-btn">Explore the Movement</button>
+              <button className="gx-secondary-btn">Become a Partner</button>
             </div>
           </div>
-        </div>
-      </section>
 
-      <section style={styles.statsSection}>
-        <div style={styles.container}>
-          <div style={styles.statsGrid}>
+          <div className="gx-hero-card">
+            <div className="gx-eyebrow">LIVE FOCUS</div>
+            <h3 className="gx-card-title">{selected.city}</h3>
+            <p className="gx-card-sub">
+              {selected.country} · {selected.region}
+            </p>
+            <p className="gx-card-text">{selected.summary}</p>
+
+            <div className="gx-tag-row">
+              <span className="gx-tag">{selected.year}</span>
+              <span className="gx-tag">{selected.type}</span>
+              <span className="gx-tag">
+                {selected.status === "live" ? "Live Now" : selected.status}
+              </span>
+            </div>
+          </div>
+        </section>
+
+        <section className="gx-stats">
+          <div className="gx-stats-grid">
             <CountCard label="Tracked Locations" target={totals.locations} />
             <CountCard label="Live Locations" target={totals.liveNow} />
             <CountCard label="People Heard Gospel" target={totals.heardGospel} />
@@ -584,32 +1183,27 @@ export default function App() {
               target={totals.testimonies}
             />
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section style={styles.globeSection}>
-        <div style={styles.container}>
-          <div style={styles.globeHeader}>
+        <section className="gx-globe-section">
+          <div className="gx-globe-header">
             <div>
-              <div style={styles.eyebrow}>INTERACTIVE GLOBE</div>
-              <h2 style={styles.globeTitle}>GX Global Impact in Motion</h2>
-              <p style={styles.globeText}>
+              <div className="gx-eyebrow">INTERACTIVE GLOBE</div>
+              <h2 className="gx-globe-title">GX Global Impact in Motion</h2>
+              <p className="gx-globe-text">
                 Explore active fields, recent outreaches and historic mission
                 footprint across the nations.
               </p>
             </div>
 
-            <div style={styles.filterRow}>
+            <div className="gx-filter-row">
               {filters.map((filter) => (
                 <button
                   key={filter.id}
                   onClick={() => setActiveFilter(filter.id)}
-                  style={{
-                    ...styles.filterButton,
-                    ...(activeFilter === filter.id
-                      ? styles.filterButtonActive
-                      : {}),
-                  }}
+                  className={`gx-filter-btn ${
+                    activeFilter === filter.id ? "active" : ""
+                  }`}
                 >
                   {filter.label}
                 </button>
@@ -617,16 +1211,16 @@ export default function App() {
             </div>
           </div>
 
-          <div style={styles.globeWrap}>
-            <div style={styles.globeCard}>
-              <div style={styles.globeAura}></div>
+          <div className="gx-globe-wrap">
+            <div className="gx-globe-card">
+              <div className="gx-globe-aura"></div>
               <Globe
                 ref={globeRef}
                 globeImageUrl="//unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
                 bumpImageUrl="//unpkg.com/three-globe/example/img/earth-topology.png"
                 backgroundColor="rgba(0,0,0,0)"
                 showAtmosphere={true}
-                atmosphereColor={gxColors.orange}
+                atmosphereColor={GX.orange}
                 atmosphereAltitude={0.22}
                 pointsData={visibleLocations}
                 pointLat="lat"
@@ -652,24 +1246,19 @@ export default function App() {
               />
             </div>
 
-            <div
-              style={{
-                ...styles.drawer,
-                ...(drawerOpen ? styles.drawerOpen : styles.drawerClosed),
-              }}
-            >
-              <div style={styles.drawerTop}>
+            <div className={`gx-drawer ${drawerOpen ? "open" : "closed"}`}>
+              <div className="gx-drawer-top">
                 <div>
-                  <div style={styles.cardLabel}>SELECTED LOCATION</div>
-                  <h3 style={styles.drawerTitle}>{selected.city}</h3>
-                  <p style={styles.drawerSub}>
+                  <div className="gx-eyebrow">SELECTED LOCATION</div>
+                  <h3 className="gx-drawer-title">{selected.city}</h3>
+                  <p className="gx-drawer-sub">
                     {selected.country} · {selected.region}
                   </p>
                 </div>
 
                 <button
                   onClick={() => setDrawerOpen(!drawerOpen)}
-                  style={styles.drawerToggle}
+                  className="gx-drawer-toggle"
                 >
                   {drawerOpen ? "Close" : "Open"}
                 </button>
@@ -678,21 +1267,21 @@ export default function App() {
               <img
                 src={imageSrc}
                 alt={selected.city}
-                style={styles.coverImage}
+                className="gx-cover"
                 onError={() => setImageSrc(createFallbackImage(selected.city))}
               />
 
-              <div style={styles.tagRow}>
-                <span style={styles.tag}>{selected.year}</span>
-                <span style={styles.tag}>{selected.type}</span>
-                <span style={styles.tag}>
+              <div className="gx-tag-row">
+                <span className="gx-tag">{selected.year}</span>
+                <span className="gx-tag">{selected.type}</span>
+                <span className="gx-tag">
                   {selected.status === "live" ? "Live Now" : selected.status}
                 </span>
               </div>
 
-              <p style={styles.cardText}>{selected.summary}</p>
+              <p className="gx-card-text">{selected.summary}</p>
 
-              <div style={styles.metricsGrid}>
+              <div className="gx-metrics-grid">
                 <MiniMetric
                   label="Heard Gospel"
                   value={selected.stats.heardGospel}
@@ -705,47 +1294,44 @@ export default function App() {
                 />
               </div>
 
-              <div style={styles.sectionBlock}>
-                <div style={styles.cardLabel}>PRAYER FOCUS</div>
-                <div style={styles.bulletList}>
+              <div className="gx-section-block">
+                <div className="gx-eyebrow">PRAYER FOCUS</div>
+                <div className="gx-bullet-list">
                   {selected.prayerFocus.map((item) => (
-                    <div key={item} style={styles.bulletRow}>
-                      <span style={styles.bulletDot}></span>
+                    <div key={item} className="gx-bullet-row">
+                      <span className="gx-bullet-dot"></span>
                       <span>{item}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div style={styles.sectionBlock}>
-                <div style={styles.cardLabel}>LOCATIONS</div>
-                <div style={styles.locationList}>
+              <div className="gx-section-block">
+                <div className="gx-eyebrow">LOCATIONS</div>
+                <div className="gx-location-list">
                   {visibleLocations.map((item) => (
                     <button
                       key={item.id}
                       onClick={() => focusLocation(item)}
-                      style={{
-                        ...styles.locationItem,
-                        ...(selected.id === item.id
-                          ? styles.locationItemActive
-                          : {}),
-                      }}
+                      className={`gx-location-btn ${
+                        selected.id === item.id ? "active" : ""
+                      }`}
                     >
                       <div>
-                        <div style={styles.locationName}>{item.city}</div>
-                        <div style={styles.locationMeta}>
+                        <div className="gx-location-name">{item.city}</div>
+                        <div className="gx-location-meta">
                           {item.country} · {item.year}
                         </div>
                       </div>
                       <span
+                        className="gx-location-dot"
                         style={{
-                          ...styles.locationDot,
                           background:
                             item.status === "live"
-                              ? gxColors.live
+                              ? GX.live
                               : item.status === "recent"
-                              ? gxColors.offWhite
-                              : gxColors.historic,
+                              ? GX.offWhite
+                              : GX.historic,
                         }}
                       ></span>
                     </button>
@@ -755,495 +1341,31 @@ export default function App() {
             </div>
           </div>
 
-          <div style={styles.testimonialWrap}>
+          <div className="gx-testimonial-wrap">
             <TestimonialSlider />
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section style={styles.bottomSection}>
-        <div style={styles.container}>
-          <div style={styles.bottomCard}>
+        <section className="gx-bottom">
+          <div className="gx-bottom-card">
             <div>
-              <div style={styles.eyebrow}>MORE THAN A MAP</div>
-              <h2 style={styles.bottomTitle}>
+              <div className="gx-eyebrow">MORE THAN A MAP</div>
+              <h2 className="gx-bottom-title">
                 This is an invitation into the movement.
               </h2>
-              <p style={styles.bottomText}>
+              <p className="gx-bottom-text">
                 Explore the nations, follow the field, pray with us, give into
                 the vision, and help fuel a ministry that is always in motion.
               </p>
             </div>
 
-            <div style={styles.buttonRow}>
-              <button style={styles.primaryButton}>Join the Mission</button>
-              <button style={styles.secondaryButton}>Give to the Vision</button>
+            <div className="gx-button-row">
+              <button className="gx-primary-btn">Join the Mission</button>
+              <button className="gx-secondary-btn">Give to the Vision</button>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
     </div>
   );
-}
-
-const styles = {
-  page: {
-    minHeight: "100vh",
-    background:
-      "radial-gradient(circle at 15% 10%, rgba(244,96,26,0.12), transparent 18%), radial-gradient(circle at 86% 22%, rgba(244,96,26,0.08), transparent 22%), #0D0D0D",
-    color: gxColors.offWhite,
-    fontFamily:
-      'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-    position: "relative",
-    overflow: "hidden",
-  },
-  backgroundGlowLeft: {
-    position: "absolute",
-    top: -180,
-    left: -140,
-    width: 520,
-    height: 520,
-    borderRadius: "50%",
-    background: "rgba(244,96,26,0.14)",
-    filter: "blur(120px)",
-    pointerEvents: "none",
-  },
-  backgroundGlowRight: {
-    position: "absolute",
-    top: 120,
-    right: -180,
-    width: 560,
-    height: 560,
-    borderRadius: "50%",
-    background: "rgba(244,96,26,0.08)",
-    filter: "blur(130px)",
-    pointerEvents: "none",
-  },
-  particlesLayer: {
-    position: "absolute",
-    inset: 0,
-    pointerEvents: "none",
-    overflow: "hidden",
-    zIndex: 1,
-  },
-  particle: {
-    position: "absolute",
-    width: 4,
-    height: 4,
-    borderRadius: "50%",
-    background: "rgba(250,250,248,0.18)",
-    boxShadow: "0 0 10px rgba(244,96,26,0.35)",
-    animation: "gxFloat 9s ease-in-out infinite",
-  },
-  container: {
-    width: "min(1480px, calc(100% - 40px))",
-    margin: "0 auto",
-    position: "relative",
-    zIndex: 2,
-  },
-  heroSection: {
-    padding: "52px 0 24px",
-  },
-  heroGrid: {
-    display: "grid",
-    gridTemplateColumns: "1.1fr 0.9fr",
-    gap: 24,
-    alignItems: "end",
-  },
-  eyebrow: {
-    fontSize: 12,
-    letterSpacing: "0.22em",
-    textTransform: "uppercase",
-    color: "rgba(250,250,248,0.55)",
-    marginBottom: 14,
-  },
-  heroTitle: {
-    margin: 0,
-    fontSize: "clamp(56px, 7vw, 102px)",
-    lineHeight: 0.9,
-    letterSpacing: "-0.07em",
-    maxWidth: 980,
-    whiteSpace: "pre-line",
-  },
-  heroTitleSoft: {
-    color: "rgba(250,250,248,0.62)",
-  },
-  heroText: {
-    marginTop: 22,
-    maxWidth: 860,
-    color: "rgba(250,250,248,0.8)",
-    fontSize: 18,
-    lineHeight: 1.8,
-  },
-  buttonRow: {
-    marginTop: 24,
-    display: "flex",
-    gap: 12,
-    flexWrap: "wrap",
-  },
-  primaryButton: {
-    background: gxColors.orange,
-    color: gxColors.offWhite,
-    border: "1px solid rgba(255,255,255,0.10)",
-    borderRadius: 18,
-    padding: "14px 18px",
-    cursor: "pointer",
-    fontWeight: 700,
-  },
-  secondaryButton: {
-    background: "rgba(255,255,255,0.05)",
-    color: gxColors.offWhite,
-    border: "1px solid rgba(255,255,255,0.12)",
-    borderRadius: 18,
-    padding: "14px 18px",
-    cursor: "pointer",
-    fontWeight: 700,
-  },
-  heroInfoCard: {
-    background:
-      "linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03))",
-    border: "1px solid rgba(255,255,255,0.10)",
-    borderRadius: 28,
-    padding: 24,
-    backdropFilter: "blur(18px)",
-    boxShadow: "0 0 40px rgba(244,96,26,0.08)",
-  },
-  cardLabel: {
-    fontSize: 12,
-    textTransform: "uppercase",
-    letterSpacing: "0.18em",
-    color: "rgba(250,250,248,0.5)",
-    marginBottom: 10,
-  },
-  cardTitle: {
-    margin: 0,
-    fontSize: 34,
-    letterSpacing: "-0.03em",
-  },
-  cardSub: {
-    marginTop: 8,
-    marginBottom: 14,
-    color: "rgba(250,250,248,0.68)",
-  },
-  cardText: {
-    color: "rgba(250,250,248,0.82)",
-    lineHeight: 1.72,
-    fontSize: 16,
-  },
-  tagRow: {
-    marginTop: 16,
-    display: "flex",
-    gap: 8,
-    flexWrap: "wrap",
-  },
-  tag: {
-    borderRadius: 999,
-    padding: "8px 12px",
-    border: "1px solid rgba(255,255,255,0.12)",
-    background: "rgba(255,255,255,0.05)",
-    color: gxColors.offWhite,
-    fontSize: 12,
-    textTransform: "capitalize",
-  },
-  statsSection: {
-    padding: "8px 0 22px",
-  },
-  statsGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(6, 1fr)",
-    gap: 12,
-  },
-  statCard: {
-    background: "rgba(255,255,255,0.04)",
-    border: "1px solid rgba(255,255,255,0.10)",
-    borderRadius: 22,
-    padding: 18,
-    minHeight: 108,
-    boxShadow: "0 0 20px rgba(244,96,26,0.03)",
-  },
-  statLabel: {
-    color: "rgba(250,250,248,0.54)",
-    fontSize: 13,
-    marginBottom: 10,
-  },
-  statValue: {
-    fontSize: 34,
-    fontWeight: 700,
-    letterSpacing: "-0.04em",
-  },
-  globeSection: {
-    paddingBottom: 30,
-  },
-  globeHeader: {
-    display: "flex",
-    justifyContent: "space-between",
-    gap: 18,
-    alignItems: "flex-end",
-    marginBottom: 18,
-  },
-  globeTitle: {
-    margin: 0,
-    fontSize: 44,
-    letterSpacing: "-0.04em",
-  },
-  globeText: {
-    color: "rgba(250,250,248,0.74)",
-    lineHeight: 1.7,
-    maxWidth: 760,
-    marginTop: 12,
-  },
-  filterRow: {
-    display: "flex",
-    gap: 8,
-    flexWrap: "wrap",
-  },
-  filterButton: {
-    borderRadius: 999,
-    padding: "10px 14px",
-    border: "1px solid rgba(255,255,255,0.12)",
-    background: "rgba(255,255,255,0.05)",
-    color: gxColors.offWhite,
-    cursor: "pointer",
-  },
-  filterButtonActive: {
-    background: gxColors.orange,
-    color: gxColors.offWhite,
-    border: "1px solid rgba(255,255,255,0.08)",
-  },
-  globeWrap: {
-    display: "grid",
-    gridTemplateColumns: "1.22fr 0.78fr",
-    gap: 18,
-    alignItems: "stretch",
-  },
-  globeCard: {
-    minHeight: 820,
-    borderRadius: 30,
-    overflow: "hidden",
-    border: "1px solid rgba(255,255,255,0.12)",
-    background:
-      "radial-gradient(circle at center, rgba(244,96,26,0.16), rgba(255,255,255,0.06) 36%, rgba(255,255,255,0.02) 62%)",
-    backdropFilter: "blur(20px)",
-    boxShadow: "0 0 80px rgba(244,96,26,0.12)",
-    position: "relative",
-  },
-  globeAura: {
-    position: "absolute",
-    left: "50%",
-    top: "50%",
-    width: 520,
-    height: 520,
-    transform: "translate(-50%, -50%)",
-    borderRadius: "50%",
-    background: "rgba(244,96,26,0.18)",
-    filter: "blur(100px)",
-    pointerEvents: "none",
-    zIndex: 0,
-    animation: "gxPulse 5.2s ease-in-out infinite",
-  },
-  drawer: {
-    borderRadius: 30,
-    border: "1px solid rgba(255,255,255,0.10)",
-    background:
-      "linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03))",
-    backdropFilter: "blur(18px)",
-    padding: 22,
-    transition: "all 0.3s ease",
-    overflow: "hidden",
-    boxShadow: "0 0 40px rgba(244,96,26,0.06)",
-  },
-  drawerOpen: {
-    opacity: 1,
-    transform: "translateX(0)",
-  },
-  drawerClosed: {
-    opacity: 0.92,
-    transform: "translateX(6px)",
-  },
-  drawerTop: {
-    display: "flex",
-    justifyContent: "space-between",
-    gap: 12,
-    alignItems: "flex-start",
-  },
-  drawerToggle: {
-    borderRadius: 14,
-    border: "1px solid rgba(255,255,255,0.10)",
-    background: "rgba(255,255,255,0.05)",
-    color: gxColors.offWhite,
-    padding: "10px 12px",
-    cursor: "pointer",
-  },
-  drawerTitle: {
-    margin: 0,
-    fontSize: 36,
-    letterSpacing: "-0.03em",
-  },
-  drawerSub: {
-    marginTop: 8,
-    color: "rgba(250,250,248,0.7)",
-  },
-  coverImage: {
-    width: "100%",
-    height: 240,
-    objectFit: "cover",
-    borderRadius: 22,
-    marginTop: 18,
-    border: "1px solid rgba(255,255,255,0.08)",
-    background: "#181818",
-  },
-  metricsGrid: {
-    marginTop: 18,
-    display: "grid",
-    gridTemplateColumns: "repeat(2, 1fr)",
-    gap: 10,
-  },
-  metricCard: {
-    borderRadius: 18,
-    border: "1px solid rgba(255,255,255,0.10)",
-    background: "rgba(0,0,0,0.18)",
-    padding: 14,
-  },
-  metricLabel: {
-    color: "rgba(250,250,248,0.48)",
-    fontSize: 12,
-    textTransform: "uppercase",
-    letterSpacing: "0.12em",
-    marginBottom: 10,
-  },
-  metricValue: {
-    fontSize: 26,
-    fontWeight: 700,
-    letterSpacing: "-0.03em",
-  },
-  sectionBlock: {
-    marginTop: 22,
-  },
-  bulletList: {
-    display: "grid",
-    gap: 12,
-    marginTop: 14,
-  },
-  bulletRow: {
-    display: "flex",
-    gap: 10,
-    color: "rgba(250,250,248,0.82)",
-    lineHeight: 1.6,
-    alignItems: "flex-start",
-  },
-  bulletDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 999,
-    background: gxColors.orange,
-    marginTop: 9,
-    flexShrink: 0,
-  },
-  locationList: {
-    display: "grid",
-    gap: 10,
-    marginTop: 14,
-    maxHeight: 320,
-    overflowY: "auto",
-    paddingRight: 4,
-  },
-  locationItem: {
-    width: "100%",
-    borderRadius: 18,
-    border: "1px solid rgba(255,255,255,0.10)",
-    background: "rgba(255,255,255,0.03)",
-    color: gxColors.offWhite,
-    padding: 14,
-    cursor: "pointer",
-    textAlign: "left",
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    gap: 10,
-  },
-  locationItemActive: {
-    background: "rgba(244,96,26,0.12)",
-    border: "1px solid rgba(244,96,26,0.28)",
-  },
-  locationName: {
-    fontWeight: 600,
-    marginBottom: 4,
-  },
-  locationMeta: {
-    color: "rgba(250,250,248,0.52)",
-    fontSize: 13,
-  },
-  locationDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 999,
-    flexShrink: 0,
-  },
-  testimonialWrap: {
-    marginTop: 18,
-  },
-  testimonialCard: {
-    borderRadius: 24,
-    border: "1px solid rgba(255,255,255,0.10)",
-    background:
-      "linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03))",
-    padding: 24,
-    boxShadow: "0 0 30px rgba(244,96,26,0.06)",
-  },
-  testimonialQuote: {
-    margin: 0,
-    fontSize: 24,
-    lineHeight: 1.6,
-    color: gxColors.offWhite,
-    maxWidth: 980,
-  },
-  testimonialPlace: {
-    marginTop: 14,
-    color: gxColors.orange,
-    fontWeight: 700,
-    letterSpacing: "0.02em",
-  },
-  bottomSection: {
-    paddingBottom: 60,
-  },
-  bottomCard: {
-    borderRadius: 28,
-    border: "1px solid rgba(255,255,255,0.10)",
-    background:
-      "linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03))",
-    padding: 28,
-    display: "grid",
-    gridTemplateColumns: "1fr auto",
-    gap: 20,
-    alignItems: "center",
-  },
-  bottomTitle: {
-    margin: 0,
-    fontSize: 42,
-    letterSpacing: "-0.04em",
-  },
-  bottomText: {
-    marginTop: 14,
-    color: "rgba(250,250,248,0.76)",
-    lineHeight: 1.7,
-    maxWidth: 780,
-  },
-};
-
-if (typeof document !== "undefined" && !document.getElementById("gx-keyframes")) {
-  const style = document.createElement("style");
-  style.id = "gx-keyframes";
-  style.innerHTML = `
-    @keyframes gxPulse {
-      0% { transform: translate(-50%, -50%) scale(0.96); opacity: 0.65; }
-      50% { transform: translate(-50%, -50%) scale(1.04); opacity: 1; }
-      100% { transform: translate(-50%, -50%) scale(0.96); opacity: 0.65; }
-    }
-    @keyframes gxFloat {
-      0% { transform: translateY(0px); opacity: 0.35; }
-      50% { transform: translateY(-14px); opacity: 0.8; }
-      100% { transform: translateY(0px); opacity: 0.35; }
-    }
-  `;
-  document.head.appendChild(style);
 }
