@@ -522,7 +522,7 @@ function GlobalStyles() {
       .gx-hero {
         padding: 52px 0 24px;
         display: grid;
-        grid-template-columns: 1.1fr 0.9fr;
+        grid-template-columns: 1.18fr 0.82fr;
         gap: 24px;
         align-items: end;
       }
@@ -537,9 +537,9 @@ function GlobalStyles() {
 
       .gx-hero-title {
         margin: 0;
-        font-size: clamp(56px, 7vw, 102px);
-        line-height: 0.9;
-        letter-spacing: -0.07em;
+        font-size: clamp(44px, 6vw, 86px);
+        line-height: 0.92;
+        letter-spacing: -0.065em;
         white-space: normal;
       }
 
@@ -555,7 +555,7 @@ function GlobalStyles() {
 
       .gx-hero-text {
         margin-top: 22px;
-        max-width: 860px;
+        max-width: 820px;
         color: rgba(250,250,248,0.8);
         font-size: 18px;
         line-height: 1.8;
@@ -571,7 +571,6 @@ function GlobalStyles() {
       .gx-primary-btn,
       .gx-secondary-btn,
       .gx-filter-btn,
-      .gx-drawer-toggle,
       .gx-location-btn {
         appearance: none;
         outline: none;
@@ -598,10 +597,11 @@ function GlobalStyles() {
       }
 
       .gx-hero-card,
-      .gx-drawer,
       .gx-bottom-card,
       .gx-testimonial-card,
-      .gx-stat-card {
+      .gx-stat-card,
+      .gx-location-panel,
+      .gx-location-list-card {
         background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
         border: 1px solid rgba(255,255,255,0.10);
         box-shadow: 0 0 40px rgba(244,96,26,0.06);
@@ -615,7 +615,7 @@ function GlobalStyles() {
 
       .gx-card-title {
         margin: 0;
-        font-size: 34px;
+        font-size: 32px;
         letter-spacing: -0.03em;
       }
 
@@ -690,7 +690,7 @@ function GlobalStyles() {
 
       .gx-globe-title {
         margin: 0;
-        font-size: 44px;
+        font-size: 40px;
         letter-spacing: -0.04em;
       }
 
@@ -722,15 +722,8 @@ function GlobalStyles() {
         border-color: rgba(255,255,255,0.08);
       }
 
-      .gx-globe-wrap {
-        display: grid;
-        grid-template-columns: 1.22fr 0.78fr;
-        gap: 18px;
-        align-items: stretch;
-      }
-
       .gx-globe-card {
-        min-height: 820px;
+        min-height: 860px;
         border-radius: 30px;
         overflow: hidden;
         border: 1px solid rgba(255,255,255,0.12);
@@ -755,54 +748,35 @@ function GlobalStyles() {
         animation: gxPulse 5.2s ease-in-out infinite;
       }
 
-      .gx-drawer {
-        border-radius: 30px;
+      .gx-location-section {
+        margin-top: 18px;
+        display: grid;
+        grid-template-columns: 1fr 0.8fr;
+        gap: 18px;
+        align-items: stretch;
+      }
+
+      .gx-location-panel,
+      .gx-location-list-card {
+        border-radius: 28px;
         padding: 22px;
-        transition: all 0.3s ease;
-        overflow: hidden;
         backdrop-filter: blur(18px);
       }
 
-      .gx-drawer.open {
-        opacity: 1;
-        transform: translateX(0);
-      }
-
-      .gx-drawer.closed {
-        opacity: 0.92;
-        transform: translateX(6px);
-      }
-
-      .gx-drawer-top {
-        display: flex;
-        justify-content: space-between;
-        gap: 12px;
-        align-items: flex-start;
-      }
-
-      .gx-drawer-title {
+      .gx-location-title {
         margin: 0;
-        font-size: 36px;
+        font-size: 34px;
         letter-spacing: -0.03em;
       }
 
-      .gx-drawer-sub {
+      .gx-location-sub {
         margin-top: 8px;
-        color: rgba(250,250,248,0.7);
-      }
-
-      .gx-drawer-toggle {
-        border-radius: 14px;
-        border: 1px solid rgba(255,255,255,0.10);
-        background: rgba(255,255,255,0.05);
-        color: #FAFAF8;
-        padding: 10px 12px;
-        cursor: pointer;
+        color: rgba(250,250,248,0.70);
       }
 
       .gx-cover {
         width: 100%;
-        height: 240px;
+        height: 250px;
         object-fit: cover;
         border-radius: 22px;
         margin-top: 18px;
@@ -813,7 +787,7 @@ function GlobalStyles() {
       .gx-metrics-grid {
         margin-top: 18px;
         display: grid;
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(4, 1fr);
         gap: 10px;
       }
 
@@ -833,7 +807,7 @@ function GlobalStyles() {
       }
 
       .gx-mini-value {
-        font-size: 26px;
+        font-size: 24px;
         font-weight: 700;
         letter-spacing: -0.03em;
       }
@@ -869,7 +843,7 @@ function GlobalStyles() {
         display: grid;
         gap: 10px;
         margin-top: 14px;
-        max-height: 320px;
+        max-height: 520px;
         overflow-y: auto;
         padding-right: 4px;
       }
@@ -966,12 +940,16 @@ function GlobalStyles() {
           grid-template-columns: repeat(3, 1fr);
         }
 
-        .gx-globe-wrap {
+        .gx-location-section {
           grid-template-columns: 1fr;
         }
 
+        .gx-metrics-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
         .gx-globe-card {
-          min-height: 720px;
+          min-height: 760px;
         }
       }
 
@@ -992,6 +970,10 @@ function GlobalStyles() {
         .gx-hero-title {
           font-size: clamp(44px, 12vw, 72px);
         }
+
+        .gx-globe-card {
+          min-height: 620px;
+        }
       }
 
       @media (max-width: 720px) {
@@ -1007,11 +989,11 @@ function GlobalStyles() {
           grid-template-columns: 1fr 1fr;
         }
 
-        .gx-globe-card {
-          min-height: 560px;
+        .gx-cover {
+          height: 210px;
         }
 
-        .gx-drawer-title,
+        .gx-location-title,
         .gx-card-title {
           font-size: 28px;
         }
@@ -1033,7 +1015,7 @@ function GlobalStyles() {
         }
 
         .gx-globe-card {
-          min-height: 500px;
+          min-height: 520px;
         }
       }
     `}</style>
@@ -1044,7 +1026,6 @@ export default function App() {
   const globeRef = useRef();
   const [activeFilter, setActiveFilter] = useState("all");
   const [selectedId, setSelectedId] = useState("tirana");
-  const [drawerOpen, setDrawerOpen] = useState(true);
   const [imageSrc, setImageSrc] = useState("");
 
   const visibleLocations = useMemo(
@@ -1097,12 +1078,11 @@ export default function App() {
 
   const focusLocation = (location) => {
     setSelectedId(location.id);
-    setDrawerOpen(true);
 
     if (!globeRef.current) return;
 
     globeRef.current.pointOfView(
-      { lat: location.lat, lng: location.lng, altitude: 1.2 },
+      { lat: location.lat, lng: location.lng, altitude: 1.22 },
       1400
     );
   };
@@ -1211,58 +1191,47 @@ export default function App() {
             </div>
           </div>
 
-          <div className="gx-globe-wrap">
-            <div className="gx-globe-card">
-              <div className="gx-globe-aura"></div>
-              <Globe
-                ref={globeRef}
-                globeImageUrl="//unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
-                bumpImageUrl="//unpkg.com/three-globe/example/img/earth-topology.png"
-                backgroundColor="rgba(0,0,0,0)"
-                showAtmosphere={true}
-                atmosphereColor={GX.orange}
-                atmosphereAltitude={0.22}
-                pointsData={visibleLocations}
-                pointLat="lat"
-                pointLng="lng"
-                pointColor={(d) => getPointColor(d.status)}
-                pointAltitude={(d) => (d.status === "live" ? 0.26 : 0.16)}
-                pointRadius={(d) => (d.status === "live" ? 0.7 : 0.45)}
-                pointResolution={20}
-                pointsMerge={false}
-                arcsData={arcsData}
-                arcColor={"color"}
-                arcStroke={0.9}
-                arcAltitude={0.2}
-                arcDashLength={0.48}
-                arcDashGap={1.6}
-                arcDashAnimateTime={2800}
-                onPointClick={(point) => focusLocation(point)}
-                onPointHover={(point) => {
-                  if (point?.id) setSelectedId(point.id);
-                }}
-                width={1120}
-                height={820}
-              />
-            </div>
+          <div className="gx-globe-card">
+            <div className="gx-globe-aura"></div>
+            <Globe
+              ref={globeRef}
+              globeImageUrl="//unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
+              bumpImageUrl="//unpkg.com/three-globe/example/img/earth-topology.png"
+              backgroundColor="rgba(0,0,0,0)"
+              showAtmosphere={true}
+              atmosphereColor={GX.orange}
+              atmosphereAltitude={0.22}
+              pointsData={visibleLocations}
+              pointLat="lat"
+              pointLng="lng"
+              pointColor={(d) => getPointColor(d.status)}
+              pointAltitude={(d) => (d.status === "live" ? 0.26 : 0.16)}
+              pointRadius={(d) => (d.status === "live" ? 0.7 : 0.45)}
+              pointResolution={20}
+              pointsMerge={false}
+              arcsData={arcsData}
+              arcColor={"color"}
+              arcStroke={0.9}
+              arcAltitude={0.2}
+              arcDashLength={0.48}
+              arcDashGap={1.6}
+              arcDashAnimateTime={2800}
+              onPointClick={(point) => focusLocation(point)}
+              onPointHover={(point) => {
+                if (point?.id) setSelectedId(point.id);
+              }}
+              width={1280}
+              height={860}
+            />
+          </div>
 
-            <div className={`gx-drawer ${drawerOpen ? "open" : "closed"}`}>
-              <div className="gx-drawer-top">
-                <div>
-                  <div className="gx-eyebrow">SELECTED LOCATION</div>
-                  <h3 className="gx-drawer-title">{selected.city}</h3>
-                  <p className="gx-drawer-sub">
-                    {selected.country} · {selected.region}
-                  </p>
-                </div>
-
-                <button
-                  onClick={() => setDrawerOpen(!drawerOpen)}
-                  className="gx-drawer-toggle"
-                >
-                  {drawerOpen ? "Close" : "Open"}
-                </button>
-              </div>
+          <div className="gx-location-section">
+            <div className="gx-location-panel">
+              <div className="gx-eyebrow">SELECTED LOCATION</div>
+              <h3 className="gx-location-title">{selected.city}</h3>
+              <p className="gx-location-sub">
+                {selected.country} · {selected.region}
+              </p>
 
               <img
                 src={imageSrc}
@@ -1305,38 +1274,38 @@ export default function App() {
                   ))}
                 </div>
               </div>
+            </div>
 
-              <div className="gx-section-block">
-                <div className="gx-eyebrow">LOCATIONS</div>
-                <div className="gx-location-list">
-                  {visibleLocations.map((item) => (
-                    <button
-                      key={item.id}
-                      onClick={() => focusLocation(item)}
-                      className={`gx-location-btn ${
-                        selected.id === item.id ? "active" : ""
-                      }`}
-                    >
-                      <div>
-                        <div className="gx-location-name">{item.city}</div>
-                        <div className="gx-location-meta">
-                          {item.country} · {item.year}
-                        </div>
+            <div className="gx-location-list-card">
+              <div className="gx-eyebrow">LOCATIONS</div>
+              <div className="gx-location-list">
+                {visibleLocations.map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => focusLocation(item)}
+                    className={`gx-location-btn ${
+                      selected.id === item.id ? "active" : ""
+                    }`}
+                  >
+                    <div>
+                      <div className="gx-location-name">{item.city}</div>
+                      <div className="gx-location-meta">
+                        {item.country} · {item.year}
                       </div>
-                      <span
-                        className="gx-location-dot"
-                        style={{
-                          background:
-                            item.status === "live"
-                              ? GX.live
-                              : item.status === "recent"
-                              ? GX.offWhite
-                              : GX.historic,
-                        }}
-                      ></span>
-                    </button>
-                  ))}
-                </div>
+                    </div>
+                    <span
+                      className="gx-location-dot"
+                      style={{
+                        background:
+                          item.status === "live"
+                            ? GX.live
+                            : item.status === "recent"
+                            ? GX.offWhite
+                            : GX.historic,
+                      }}
+                    ></span>
+                  </button>
+                ))}
               </div>
             </div>
           </div>
