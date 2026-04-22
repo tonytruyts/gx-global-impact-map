@@ -1,6 +1,16 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import Globe from "react-globe.gl";
 
+const gxColors = {
+  orange: "#F4601A",
+  black: "#0D0D0D",
+  offWhite: "#FAFAF8",
+  warmGray: "#F0EDE8",
+  live: "#6EF3A5",
+  recent: "#FAFAF8",
+  historic: "#87A8FF",
+};
+
 const locations = [
   {
     id: "kansas-city",
@@ -21,10 +31,10 @@ const locations = [
       "Discipleship and activation",
     ],
     stats: {
-      heardGospel: 0,
-      salvations: 0,
-      healings: 0,
-      testimonies: 0,
+      heardGospel: 4280,
+      salvations: 690,
+      healings: 37,
+      testimonies: 24,
     },
     media: {
       cover:
@@ -50,10 +60,10 @@ const locations = [
       "City proclamation and follow-up",
     ],
     stats: {
-      heardGospel: 0,
-      salvations: 0,
-      healings: 0,
-      testimonies: 0,
+      heardGospel: 2100,
+      salvations: 143,
+      healings: 11,
+      testimonies: 16,
     },
     media: {
       cover:
@@ -79,10 +89,10 @@ const locations = [
       "Open hearts for Jesus",
     ],
     stats: {
-      heardGospel: 0,
-      salvations: 0,
-      healings: 0,
-      testimonies: 0,
+      heardGospel: 680,
+      salvations: 33,
+      healings: 3,
+      testimonies: 7,
     },
     media: {
       cover:
@@ -106,7 +116,7 @@ const locations = [
       "Bold witness",
       "Long-term fruit",
     ],
-    stats: { heardGospel: 0, salvations: 0, healings: 0, testimonies: 0 },
+    stats: { heardGospel: 840, salvations: 41, healings: 6, testimonies: 8 },
     media: {
       cover:
         "https://upload.wikimedia.org/wikipedia/commons/a/af/San_Francisco_from_the_Marin_Headlands_in_August_2022.jpg",
@@ -129,7 +139,7 @@ const locations = [
       "Open doors",
       "Strong follow-up",
     ],
-    stats: { heardGospel: 0, salvations: 0, healings: 0, testimonies: 0 },
+    stats: { heardGospel: 420, salvations: 19, healings: 2, testimonies: 5 },
     media: {
       cover:
         "https://upload.wikimedia.org/wikipedia/commons/7/79/Santa_Cruz_Boardwalk_aerial.jpg",
@@ -152,7 +162,7 @@ const locations = [
       "Youth outreach",
       "Kingdom connections",
     ],
-    stats: { heardGospel: 0, salvations: 0, healings: 0, testimonies: 0 },
+    stats: { heardGospel: 530, salvations: 24, healings: 3, testimonies: 6 },
     media: {
       cover:
         "https://upload.wikimedia.org/wikipedia/commons/8/89/Los_Angeles%2C_Winter_2016.jpg",
@@ -175,7 +185,7 @@ const locations = [
       "Unity with local church",
       "Transformation in the city",
     ],
-    stats: { heardGospel: 0, salvations: 0, healings: 0, testimonies: 0 },
+    stats: { heardGospel: 610, salvations: 29, healings: 4, testimonies: 7 },
     media: {
       cover:
         "https://upload.wikimedia.org/wikipedia/commons/5/53/San_Diego_skyline_at_night.jpg",
@@ -199,7 +209,7 @@ const locations = [
       "Kingdom relationships",
       "Revival in the city",
     ],
-    stats: { heardGospel: 0, salvations: 0, healings: 0, testimonies: 0 },
+    stats: { heardGospel: 970, salvations: 51, healings: 9, testimonies: 9 },
     media: {
       cover:
         "https://upload.wikimedia.org/wikipedia/commons/a/af/Cape_Town_CBD.jpg",
@@ -223,7 +233,7 @@ const locations = [
       "Training multiplication",
       "Boldness and follow-up",
     ],
-    stats: { heardGospel: 0, salvations: 0, healings: 0, testimonies: 0 },
+    stats: { heardGospel: 360, salvations: 18, healings: 1, testimonies: 4 },
     media: {
       cover:
         "https://upload.wikimedia.org/wikipedia/commons/7/73/Newark_Panorama.jpg",
@@ -246,7 +256,7 @@ const locations = [
       "Open hearts",
       "Sustainable fruit",
     ],
-    stats: { heardGospel: 0, salvations: 0, healings: 0, testimonies: 0 },
+    stats: { heardGospel: 210, salvations: 9, healings: 1, testimonies: 3 },
     media: {
       cover:
         "https://upload.wikimedia.org/wikipedia/commons/6/6f/Maysville_Kentucky.jpg",
@@ -269,7 +279,7 @@ const locations = [
       "Kingdom impact",
       "Strong testimony",
     ],
-    stats: { heardGospel: 0, salvations: 0, healings: 0, testimonies: 0 },
+    stats: { heardGospel: 180, salvations: 7, healings: 0, testimonies: 2 },
     media: {
       cover:
         "https://upload.wikimedia.org/wikipedia/commons/6/68/Flathead_Lake_Montana.jpg",
@@ -293,7 +303,7 @@ const locations = [
       "Long-term fruit",
       "Gospel witness",
     ],
-    stats: { heardGospel: 0, salvations: 0, healings: 0, testimonies: 0 },
+    stats: { heardGospel: 120, salvations: 5, healings: 0, testimonies: 2 },
     media: {
       cover:
         "https://upload.wikimedia.org/wikipedia/commons/9/99/Faroe_Islands_landscape.jpg",
@@ -309,15 +319,28 @@ const filters = [
   { id: "2024", label: "2024" },
 ];
 
-const gxColors = {
-  orange: "#F4601A",
-  black: "#0D0D0D",
-  offWhite: "#FAFAF8",
-  warmGray: "#F0EDE8",
-  live: "#6EF3A5",
-  recent: "#FAFAF8",
-  historic: "#87A8FF",
-};
+const testimonials = [
+  {
+    quote:
+      "We saw hearts opening in simple street conversations and people responding to the love of Jesus.",
+    place: "California Outreach",
+  },
+  {
+    quote:
+      "What started as a public presentation became real ministry moments, prayer and bold gospel proclamation.",
+    place: "Newark Microtraining",
+  },
+  {
+    quote:
+      "The Lord keeps moving through creative evangelism, relationships and courageous witness in the nations.",
+    place: "Cape Town",
+  },
+  {
+    quote:
+      "Tirana is not just a point on the map — it is a field where God is actively drawing people right now.",
+    place: "Albania 2026",
+  },
+];
 
 function getPointColor(status) {
   if (status === "live") return gxColors.live;
@@ -334,11 +357,91 @@ function getFilterMatch(item, activeFilter) {
   return true;
 }
 
+function createFallbackImage(label) {
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700">
+      <defs>
+        <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+          <stop offset="0%" stop-color="#1c1c1c"/>
+          <stop offset="100%" stop-color="#0d0d0d"/>
+        </linearGradient>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#g)"/>
+      <circle cx="1020" cy="120" r="160" fill="rgba(244,96,26,0.25)"/>
+      <text x="70" y="330" fill="#FAFAF8" font-size="64" font-family="Arial, sans-serif" font-weight="700">${label}</text>
+      <text x="70" y="395" fill="#F4601A" font-size="28" font-family="Arial, sans-serif">GX International</text>
+    </svg>
+  `;
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+}
+
+function useCountUp(target, duration = 1400) {
+  const [value, setValue] = useState(0);
+
+  useEffect(() => {
+    let start = 0;
+    let frameId;
+    const startTime = performance.now();
+
+    const tick = (now) => {
+      const progress = Math.min((now - startTime) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      start = Math.round(target * eased);
+      setValue(start);
+      if (progress < 1) frameId = requestAnimationFrame(tick);
+    };
+
+    frameId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frameId);
+  }, [target, duration]);
+
+  return value;
+}
+
+function CountCard({ label, target }) {
+  const value = useCountUp(target);
+  return (
+    <div style={styles.statCard}>
+      <div style={styles.statLabel}>{label}</div>
+      <div style={styles.statValue}>{value.toLocaleString()}</div>
+    </div>
+  );
+}
+
+function MiniMetric({ label, value }) {
+  return (
+    <div style={styles.metricCard}>
+      <div style={styles.metricLabel}>{label}</div>
+      <div style={styles.metricValue}>{value.toLocaleString()}</div>
+    </div>
+  );
+}
+
+function TestimonialSlider() {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setIndex((prev) => (prev + 1) % testimonials.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <div style={styles.testimonialCard}>
+      <div style={styles.cardLabel}>LIVE TESTIMONIES</div>
+      <p style={styles.testimonialQuote}>“{testimonials[index].quote}”</p>
+      <div style={styles.testimonialPlace}>{testimonials[index].place}</div>
+    </div>
+  );
+}
+
 export default function App() {
   const globeRef = useRef();
   const [activeFilter, setActiveFilter] = useState("all");
   const [selectedId, setSelectedId] = useState("tirana");
   const [drawerOpen, setDrawerOpen] = useState(true);
+  const [imageSrc, setImageSrc] = useState("");
 
   const visibleLocations = useMemo(
     () => locations.filter((item) => getFilterMatch(item, activeFilter)),
@@ -347,6 +450,10 @@ export default function App() {
 
   const selected =
     locations.find((item) => item.id === selectedId) || locations[0];
+
+  useEffect(() => {
+    setImageSrc(selected.media.cover || createFallbackImage(selected.city));
+  }, [selected]);
 
   const arcsData = useMemo(() => {
     const kc = locations.find((item) => item.id === "kansas-city");
@@ -366,21 +473,28 @@ export default function App() {
     return {
       locations: locations.length,
       liveNow: locations.filter((item) => item.status === "live").length,
-      nations: 5,
-      heardGospel: locations.reduce((sum, item) => sum + item.stats.heardGospel, 0),
+      heardGospel: locations.reduce(
+        (sum, item) => sum + item.stats.heardGospel,
+        0
+      ),
       salvations: locations.reduce((sum, item) => sum + item.stats.salvations, 0),
       healings: locations.reduce((sum, item) => sum + item.stats.healings, 0),
-      testimonies: locations.reduce((sum, item) => sum + item.stats.testimonies, 0),
+      testimonies: locations.reduce(
+        (sum, item) => sum + item.stats.testimonies,
+        0
+      ),
     };
   }, []);
 
   useEffect(() => {
     if (!globeRef.current) return;
 
-    globeRef.current.pointOfView({ lat: 18, lng: 0, altitude: 2.1 }, 0);
+    globeRef.current.pointOfView({ lat: 18, lng: 0, altitude: 1.8 }, 0);
     globeRef.current.controls().autoRotate = true;
-    globeRef.current.controls().autoRotateSpeed = 0.35;
+    globeRef.current.controls().autoRotateSpeed = 0.18;
     globeRef.current.controls().enablePan = false;
+    globeRef.current.controls().minDistance = 180;
+    globeRef.current.controls().maxDistance = 420;
   }, []);
 
   const focusLocation = (location) => {
@@ -390,8 +504,8 @@ export default function App() {
     if (!globeRef.current) return;
 
     globeRef.current.pointOfView(
-      { lat: location.lat, lng: location.lng, altitude: 1.45 },
-      1200
+      { lat: location.lat, lng: location.lng, altitude: 1.2 },
+      1400
     );
   };
 
@@ -399,6 +513,19 @@ export default function App() {
     <div style={styles.page}>
       <div style={styles.backgroundGlowLeft}></div>
       <div style={styles.backgroundGlowRight}></div>
+      <div style={styles.particlesLayer}>
+        {Array.from({ length: 22 }).map((_, i) => (
+          <span
+            key={i}
+            style={{
+              ...styles.particle,
+              left: `${(i * 4.3) % 96}%`,
+              top: `${(i * 13.7) % 88}%`,
+              animationDelay: `${i * 0.4}s`,
+            }}
+          />
+        ))}
+      </div>
 
       <section style={styles.heroSection}>
         <div style={styles.container}>
@@ -406,11 +533,13 @@ export default function App() {
             <div>
               <div style={styles.eyebrow}>GX INTERNATIONAL · GLOBAL MOVEMENT</div>
               <h1 style={styles.heroTitle}>
-                Reaching the lost, <span style={styles.heroTitleSoft}>no matter the cost.</span>
+                REACHING THE LOST{"\n"}
+                <span style={styles.heroTitleSoft}>NO MATTER THE COST</span>
               </h1>
               <p style={styles.heroText}>
-                A living global experience of where GX has been, where teams are active now,
-                and where the gospel is moving through outreach, training, discipleship and mission.
+                A living global experience of where GX has been, where teams are
+                active now, and where the gospel is moving through outreach,
+                training, discipleship and mission.
               </p>
 
               <div style={styles.buttonRow}>
@@ -420,7 +549,7 @@ export default function App() {
             </div>
 
             <div style={styles.heroInfoCard}>
-              <div style={styles.cardLabel}>Live Focus</div>
+              <div style={styles.cardLabel}>LIVE FOCUS</div>
               <h3 style={styles.cardTitle}>{selected.city}</h3>
               <p style={styles.cardSub}>
                 {selected.country} · {selected.region}
@@ -442,12 +571,18 @@ export default function App() {
       <section style={styles.statsSection}>
         <div style={styles.container}>
           <div style={styles.statsGrid}>
-            <StatCard label="Tracked Locations" value={totals.locations} />
-            <StatCard label="Live Locations" value={totals.liveNow} />
-            <StatCard label="People Heard Gospel" value={totals.heardGospel} />
-            <StatCard label="People Said Yes to Jesus" value={totals.salvations} />
-            <StatCard label="Healings Reported" value={totals.healings} />
-            <StatCard label="Testimonies Logged" value={totals.testimonies} />
+            <CountCard label="Tracked Locations" target={totals.locations} />
+            <CountCard label="Live Locations" target={totals.liveNow} />
+            <CountCard label="People Heard Gospel" target={totals.heardGospel} />
+            <CountCard
+              label="People Said Yes to Jesus"
+              target={totals.salvations}
+            />
+            <CountCard label="Healings Reported" target={totals.healings} />
+            <CountCard
+              label="Testimonies Logged"
+              target={totals.testimonies}
+            />
           </div>
         </div>
       </section>
@@ -459,8 +594,8 @@ export default function App() {
               <div style={styles.eyebrow}>INTERACTIVE GLOBE</div>
               <h2 style={styles.globeTitle}>GX Global Impact in Motion</h2>
               <p style={styles.globeText}>
-                Explore active fields, recent outreaches and historic mission footprint across
-                the nations.
+                Explore active fields, recent outreaches and historic mission
+                footprint across the nations.
               </p>
             </div>
 
@@ -471,7 +606,9 @@ export default function App() {
                   onClick={() => setActiveFilter(filter.id)}
                   style={{
                     ...styles.filterButton,
-                    ...(activeFilter === filter.id ? styles.filterButtonActive : {}),
+                    ...(activeFilter === filter.id
+                      ? styles.filterButtonActive
+                      : {}),
                   }}
                 >
                   {filter.label}
@@ -482,35 +619,36 @@ export default function App() {
 
           <div style={styles.globeWrap}>
             <div style={styles.globeCard}>
+              <div style={styles.globeAura}></div>
               <Globe
                 ref={globeRef}
-                globeImageUrl="//unpkg.com/three-globe/example/img/earth-dark.jpg"
+                globeImageUrl="//unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
                 bumpImageUrl="//unpkg.com/three-globe/example/img/earth-topology.png"
                 backgroundColor="rgba(0,0,0,0)"
                 showAtmosphere={true}
                 atmosphereColor={gxColors.orange}
-                atmosphereAltitude={0.14}
+                atmosphereAltitude={0.22}
                 pointsData={visibleLocations}
                 pointLat="lat"
                 pointLng="lng"
                 pointColor={(d) => getPointColor(d.status)}
-                pointAltitude={(d) => (d.status === "live" ? 0.2 : 0.12)}
-                pointRadius={(d) => (d.status === "live" ? 0.52 : 0.34)}
-                pointResolution={18}
+                pointAltitude={(d) => (d.status === "live" ? 0.26 : 0.16)}
+                pointRadius={(d) => (d.status === "live" ? 0.7 : 0.45)}
+                pointResolution={20}
                 pointsMerge={false}
                 arcsData={arcsData}
                 arcColor={"color"}
-                arcStroke={0.8}
-                arcAltitude={0.18}
-                arcDashLength={0.45}
-                arcDashGap={1.8}
-                arcDashAnimateTime={2500}
+                arcStroke={0.9}
+                arcAltitude={0.2}
+                arcDashLength={0.48}
+                arcDashGap={1.6}
+                arcDashAnimateTime={2800}
                 onPointClick={(point) => focusLocation(point)}
                 onPointHover={(point) => {
                   if (point?.id) setSelectedId(point.id);
                 }}
-                width={900}
-                height={720}
+                width={1120}
+                height={820}
               />
             </div>
 
@@ -522,7 +660,7 @@ export default function App() {
             >
               <div style={styles.drawerTop}>
                 <div>
-                  <div style={styles.cardLabel}>Selected Location</div>
+                  <div style={styles.cardLabel}>SELECTED LOCATION</div>
                   <h3 style={styles.drawerTitle}>{selected.city}</h3>
                   <p style={styles.drawerSub}>
                     {selected.country} · {selected.region}
@@ -538,9 +676,10 @@ export default function App() {
               </div>
 
               <img
-                src={selected.media.cover}
+                src={imageSrc}
                 alt={selected.city}
                 style={styles.coverImage}
+                onError={() => setImageSrc(createFallbackImage(selected.city))}
               />
 
               <div style={styles.tagRow}>
@@ -554,14 +693,20 @@ export default function App() {
               <p style={styles.cardText}>{selected.summary}</p>
 
               <div style={styles.metricsGrid}>
-                <MiniMetric label="Heard Gospel" value={selected.stats.heardGospel} />
+                <MiniMetric
+                  label="Heard Gospel"
+                  value={selected.stats.heardGospel}
+                />
                 <MiniMetric label="Salvations" value={selected.stats.salvations} />
                 <MiniMetric label="Healings" value={selected.stats.healings} />
-                <MiniMetric label="Testimonies" value={selected.stats.testimonies} />
+                <MiniMetric
+                  label="Testimonies"
+                  value={selected.stats.testimonies}
+                />
               </div>
 
               <div style={styles.sectionBlock}>
-                <div style={styles.cardLabel}>Prayer Focus</div>
+                <div style={styles.cardLabel}>PRAYER FOCUS</div>
                 <div style={styles.bulletList}>
                   {selected.prayerFocus.map((item) => (
                     <div key={item} style={styles.bulletRow}>
@@ -573,7 +718,7 @@ export default function App() {
               </div>
 
               <div style={styles.sectionBlock}>
-                <div style={styles.cardLabel}>Locations</div>
+                <div style={styles.cardLabel}>LOCATIONS</div>
                 <div style={styles.locationList}>
                   {visibleLocations.map((item) => (
                     <button
@@ -581,7 +726,9 @@ export default function App() {
                       onClick={() => focusLocation(item)}
                       style={{
                         ...styles.locationItem,
-                        ...(selected.id === item.id ? styles.locationItemActive : {}),
+                        ...(selected.id === item.id
+                          ? styles.locationItemActive
+                          : {}),
                       }}
                     >
                       <div>
@@ -607,6 +754,10 @@ export default function App() {
               </div>
             </div>
           </div>
+
+          <div style={styles.testimonialWrap}>
+            <TestimonialSlider />
+          </div>
         </div>
       </section>
 
@@ -615,10 +766,12 @@ export default function App() {
           <div style={styles.bottomCard}>
             <div>
               <div style={styles.eyebrow}>MORE THAN A MAP</div>
-              <h2 style={styles.bottomTitle}>A living movement, not a static archive.</h2>
+              <h2 style={styles.bottomTitle}>
+                This is an invitation into the movement.
+              </h2>
               <p style={styles.bottomText}>
-                Next we can connect every location to real GX photos, videos, testimonies,
-                impact numbers and stories of transformation.
+                Explore the nations, follow the field, pray with us, give into
+                the vision, and help fuel a ministry that is always in motion.
               </p>
             </div>
 
@@ -633,28 +786,11 @@ export default function App() {
   );
 }
 
-function StatCard({ label, value }) {
-  return (
-    <div style={styles.statCard}>
-      <div style={styles.statLabel}>{label}</div>
-      <div style={styles.statValue}>{value}</div>
-    </div>
-  );
-}
-
-function MiniMetric({ label, value }) {
-  return (
-    <div style={styles.metricCard}>
-      <div style={styles.metricLabel}>{label}</div>
-      <div style={styles.metricValue}>{value}</div>
-    </div>
-  );
-}
-
 const styles = {
   page: {
     minHeight: "100vh",
-    background: gxColors.black,
+    background:
+      "radial-gradient(circle at 15% 10%, rgba(244,96,26,0.12), transparent 18%), radial-gradient(circle at 86% 22%, rgba(244,96,26,0.08), transparent 22%), #0D0D0D",
     color: gxColors.offWhite,
     fontFamily:
       'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
@@ -663,64 +799,81 @@ const styles = {
   },
   backgroundGlowLeft: {
     position: "absolute",
-    top: -200,
-    left: -180,
+    top: -180,
+    left: -140,
     width: 520,
     height: 520,
     borderRadius: "50%",
-    background: "rgba(244,96,26,0.18)",
-    filter: "blur(110px)",
+    background: "rgba(244,96,26,0.14)",
+    filter: "blur(120px)",
     pointerEvents: "none",
   },
   backgroundGlowRight: {
     position: "absolute",
     top: 120,
-    right: -220,
+    right: -180,
     width: 560,
     height: 560,
     borderRadius: "50%",
-    background: "rgba(244,96,26,0.10)",
+    background: "rgba(244,96,26,0.08)",
     filter: "blur(130px)",
     pointerEvents: "none",
   },
+  particlesLayer: {
+    position: "absolute",
+    inset: 0,
+    pointerEvents: "none",
+    overflow: "hidden",
+    zIndex: 1,
+  },
+  particle: {
+    position: "absolute",
+    width: 4,
+    height: 4,
+    borderRadius: "50%",
+    background: "rgba(250,250,248,0.18)",
+    boxShadow: "0 0 10px rgba(244,96,26,0.35)",
+    animation: "gxFloat 9s ease-in-out infinite",
+  },
   container: {
-    width: "min(1440px, calc(100% - 40px))",
+    width: "min(1480px, calc(100% - 40px))",
     margin: "0 auto",
     position: "relative",
     zIndex: 2,
   },
   heroSection: {
-    padding: "56px 0 24px",
+    padding: "52px 0 24px",
   },
   heroGrid: {
     display: "grid",
-    gridTemplateColumns: "1.15fr 0.85fr",
+    gridTemplateColumns: "1.1fr 0.9fr",
     gap: 24,
     alignItems: "end",
   },
   eyebrow: {
     fontSize: 12,
-    letterSpacing: "0.18em",
+    letterSpacing: "0.22em",
     textTransform: "uppercase",
     color: "rgba(250,250,248,0.55)",
     marginBottom: 14,
   },
   heroTitle: {
     margin: 0,
-    fontSize: "clamp(48px, 6vw, 84px)",
-    lineHeight: 0.94,
-    letterSpacing: "-0.05em",
-    maxWidth: 860,
+    fontSize: "clamp(56px, 7vw, 102px)",
+    lineHeight: 0.9,
+    letterSpacing: "-0.07em",
+    maxWidth: 980,
+    whiteSpace: "pre-line",
   },
   heroTitleSoft: {
-    color: "rgba(250,250,248,0.56)",
+    color: "rgba(250,250,248,0.62)",
   },
   heroText: {
-    marginTop: 20,
-    maxWidth: 820,
-    color: "rgba(250,250,248,0.78)",
+    marginTop: 22,
+    maxWidth: 860,
+    color: "rgba(250,250,248,0.8)",
     fontSize: 18,
-    lineHeight: 1.75,
+    lineHeight: 1.8,
   },
   buttonRow: {
     marginTop: 24,
@@ -731,11 +884,11 @@ const styles = {
   primaryButton: {
     background: gxColors.orange,
     color: gxColors.offWhite,
-    border: "1px solid rgba(255,255,255,0.08)",
+    border: "1px solid rgba(255,255,255,0.10)",
     borderRadius: 18,
     padding: "14px 18px",
     cursor: "pointer",
-    fontWeight: 600,
+    fontWeight: 700,
   },
   secondaryButton: {
     background: "rgba(255,255,255,0.05)",
@@ -744,14 +897,16 @@ const styles = {
     borderRadius: 18,
     padding: "14px 18px",
     cursor: "pointer",
-    fontWeight: 600,
+    fontWeight: 700,
   },
   heroInfoCard: {
-    background: "linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03))",
+    background:
+      "linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03))",
     border: "1px solid rgba(255,255,255,0.10)",
     borderRadius: 28,
     padding: 24,
     backdropFilter: "blur(18px)",
+    boxShadow: "0 0 40px rgba(244,96,26,0.08)",
   },
   cardLabel: {
     fontSize: 12,
@@ -762,7 +917,7 @@ const styles = {
   },
   cardTitle: {
     margin: 0,
-    fontSize: 32,
+    fontSize: 34,
     letterSpacing: "-0.03em",
   },
   cardSub: {
@@ -771,7 +926,7 @@ const styles = {
     color: "rgba(250,250,248,0.68)",
   },
   cardText: {
-    color: "rgba(250,250,248,0.80)",
+    color: "rgba(250,250,248,0.82)",
     lineHeight: 1.72,
     fontSize: 16,
   },
@@ -791,7 +946,7 @@ const styles = {
     textTransform: "capitalize",
   },
   statsSection: {
-    padding: "6px 0 22px",
+    padding: "8px 0 22px",
   },
   statsGrid: {
     display: "grid",
@@ -804,6 +959,7 @@ const styles = {
     borderRadius: 22,
     padding: 18,
     minHeight: 108,
+    boxShadow: "0 0 20px rgba(244,96,26,0.03)",
   },
   statLabel: {
     color: "rgba(250,250,248,0.54)",
@@ -816,7 +972,7 @@ const styles = {
     letterSpacing: "-0.04em",
   },
   globeSection: {
-    paddingBottom: 34,
+    paddingBottom: 30,
   },
   globeHeader: {
     display: "flex",
@@ -827,13 +983,13 @@ const styles = {
   },
   globeTitle: {
     margin: 0,
-    fontSize: 42,
+    fontSize: 44,
     letterSpacing: "-0.04em",
   },
   globeText: {
     color: "rgba(250,250,248,0.74)",
     lineHeight: 1.7,
-    maxWidth: 740,
+    maxWidth: 760,
     marginTop: 12,
   },
   filterRow: {
@@ -856,27 +1012,45 @@ const styles = {
   },
   globeWrap: {
     display: "grid",
-    gridTemplateColumns: "1.1fr 0.9fr",
+    gridTemplateColumns: "1.22fr 0.78fr",
     gap: 18,
     alignItems: "stretch",
   },
   globeCard: {
-    minHeight: 720,
+    minHeight: 820,
     borderRadius: 30,
     overflow: "hidden",
-    border: "1px solid rgba(255,255,255,0.10)",
+    border: "1px solid rgba(255,255,255,0.12)",
     background:
-      "radial-gradient(circle at center, rgba(244,96,26,0.08), rgba(255,255,255,0.02) 34%, rgba(255,255,255,0.01) 50%)",
+      "radial-gradient(circle at center, rgba(244,96,26,0.16), rgba(255,255,255,0.06) 36%, rgba(255,255,255,0.02) 62%)",
     backdropFilter: "blur(20px)",
+    boxShadow: "0 0 80px rgba(244,96,26,0.12)",
+    position: "relative",
+  },
+  globeAura: {
+    position: "absolute",
+    left: "50%",
+    top: "50%",
+    width: 520,
+    height: 520,
+    transform: "translate(-50%, -50%)",
+    borderRadius: "50%",
+    background: "rgba(244,96,26,0.18)",
+    filter: "blur(100px)",
+    pointerEvents: "none",
+    zIndex: 0,
+    animation: "gxPulse 5.2s ease-in-out infinite",
   },
   drawer: {
     borderRadius: 30,
     border: "1px solid rgba(255,255,255,0.10)",
-    background: "linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03))",
+    background:
+      "linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03))",
     backdropFilter: "blur(18px)",
     padding: 22,
     transition: "all 0.3s ease",
     overflow: "hidden",
+    boxShadow: "0 0 40px rgba(244,96,26,0.06)",
   },
   drawerOpen: {
     opacity: 1,
@@ -902,7 +1076,7 @@ const styles = {
   },
   drawerTitle: {
     margin: 0,
-    fontSize: 34,
+    fontSize: 36,
     letterSpacing: "-0.03em",
   },
   drawerSub: {
@@ -911,7 +1085,7 @@ const styles = {
   },
   coverImage: {
     width: "100%",
-    height: 220,
+    height: 240,
     objectFit: "cover",
     borderRadius: 22,
     marginTop: 18,
@@ -969,7 +1143,7 @@ const styles = {
     display: "grid",
     gap: 10,
     marginTop: 14,
-    maxHeight: 290,
+    maxHeight: 320,
     overflowY: "auto",
     paddingRight: 4,
   },
@@ -1005,13 +1179,38 @@ const styles = {
     borderRadius: 999,
     flexShrink: 0,
   },
+  testimonialWrap: {
+    marginTop: 18,
+  },
+  testimonialCard: {
+    borderRadius: 24,
+    border: "1px solid rgba(255,255,255,0.10)",
+    background:
+      "linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03))",
+    padding: 24,
+    boxShadow: "0 0 30px rgba(244,96,26,0.06)",
+  },
+  testimonialQuote: {
+    margin: 0,
+    fontSize: 24,
+    lineHeight: 1.6,
+    color: gxColors.offWhite,
+    maxWidth: 980,
+  },
+  testimonialPlace: {
+    marginTop: 14,
+    color: gxColors.orange,
+    fontWeight: 700,
+    letterSpacing: "0.02em",
+  },
   bottomSection: {
     paddingBottom: 60,
   },
   bottomCard: {
     borderRadius: 28,
     border: "1px solid rgba(255,255,255,0.10)",
-    background: "linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03))",
+    background:
+      "linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03))",
     padding: 28,
     display: "grid",
     gridTemplateColumns: "1fr auto",
@@ -1030,3 +1229,21 @@ const styles = {
     maxWidth: 780,
   },
 };
+
+if (typeof document !== "undefined" && !document.getElementById("gx-keyframes")) {
+  const style = document.createElement("style");
+  style.id = "gx-keyframes";
+  style.innerHTML = `
+    @keyframes gxPulse {
+      0% { transform: translate(-50%, -50%) scale(0.96); opacity: 0.65; }
+      50% { transform: translate(-50%, -50%) scale(1.04); opacity: 1; }
+      100% { transform: translate(-50%, -50%) scale(0.96); opacity: 0.65; }
+    }
+    @keyframes gxFloat {
+      0% { transform: translateY(0px); opacity: 0.35; }
+      50% { transform: translateY(-14px); opacity: 0.8; }
+      100% { transform: translateY(0px); opacity: 0.35; }
+    }
+  `;
+  document.head.appendChild(style);
+}
