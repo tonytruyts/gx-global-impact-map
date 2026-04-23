@@ -1,4 +1,10 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useLayoutEffect,
+} from "react";
 import Globe from "react-globe.gl";
 
 const GX = {
@@ -113,13 +119,61 @@ function TestimonialSlider({ testimonials }) {
   );
 }
 
+function useContainerSize(ref) {
+  const [size, setSize] = useState({ width: 0, height: 0 });
+
+  useLayoutEffect(() => {
+    if (!ref.current) return;
+
+    const update = () => {
+      const width = ref.current?.clientWidth || 0;
+      const isMobile = width <= 520;
+      const isTablet = width <= 980;
+
+      let height = 860;
+      if (isMobile) height = 420;
+      else if (isTablet) height = 560;
+
+      setSize({ width, height });
+    };
+
+    update();
+
+    const observer = new ResizeObserver(update);
+    observer.observe(ref.current);
+    window.addEventListener("resize", update);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", update);
+    };
+  }, [ref]);
+
+  return size;
+}
+
 function GlobalStyles() {
   return (
     <style>{`
       * { box-sizing: border-box; }
-      html, body, #root { margin: 0; min-height: 100%; background: #0D0D0D; }
-      body { overflow-x: hidden; }
-      button { font: inherit; }
+      html, body, #root {
+        margin: 0;
+        min-height: 100%;
+        background: #0D0D0D;
+      }
+
+      body {
+        overflow-x: hidden;
+      }
+
+      img {
+        max-width: 100%;
+        display: block;
+      }
+
+      button {
+        font: inherit;
+      }
 
       @keyframes gxPulse {
         0% { transform: translate(-50%, -50%) scale(0.96); opacity: 0.65; }
@@ -397,7 +451,6 @@ function GlobalStyles() {
       }
 
       .gx-globe-card {
-        min-height: 860px;
         border-radius: 30px;
         overflow: hidden;
         border: 1px solid rgba(255,255,255,0.12);
@@ -420,6 +473,20 @@ function GlobalStyles() {
         pointer-events: none;
         z-index: 0;
         animation: gxPulse 5.2s ease-in-out infinite;
+      }
+
+      .gx-globe-stage {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        overflow: hidden;
+      }
+
+      .gx-globe-note {
+        display: none;
+        color: rgba(250,250,248,0.58);
+        font-size: 12px;
+        padding: 0 14px 14px;
       }
 
       .gx-location-section {
@@ -621,15 +688,16 @@ function GlobalStyles() {
         .gx-metrics-grid {
           grid-template-columns: repeat(2, 1fr);
         }
-
-        .gx-globe-card {
-          min-height: 760px;
-        }
       }
 
       @media (max-width: 980px) {
+        .gx-container {
+          width: min(100% - 24px, 1480px);
+        }
+
         .gx-hero {
           grid-template-columns: 1fr;
+          padding: 34px 0 18px;
         }
 
         .gx-globe-header {
@@ -642,11 +710,7 @@ function GlobalStyles() {
         }
 
         .gx-hero-title {
-          font-size: clamp(42px, 12vw, 72px);
-        }
-
-        .gx-globe-card {
-          min-height: 620px;
+          font-size: clamp(42px, 10vw, 72px);
         }
 
         .gx-cover {
@@ -656,28 +720,64 @@ function GlobalStyles() {
 
       @media (max-width: 720px) {
         .gx-container {
-          width: min(100% - 20px, 1480px);
+          width: min(100% - 16px, 1480px);
         }
 
-        .gx-hero {
-          padding-top: 34px;
+        .gx-eyebrow {
+          font-size: 10px;
+          letter-spacing: 0.18em;
+          margin-bottom: 10px;
+        }
+
+        .gx-hero-title {
+          font-size: clamp(34px, 12vw, 52px);
+          line-height: 0.94;
+        }
+
+        .gx-hero-text {
+          font-size: 14px;
+          line-height: 1.65;
+          margin-top: 16px;
+        }
+
+        .gx-button-row {
+          gap: 10px;
+        }
+
+        .gx-primary-btn,
+        .gx-secondary-btn {
+          width: 100%;
+          justify-content: center;
+          text-align: center;
+          padding: 13px 16px;
         }
 
         .gx-stats-grid {
           grid-template-columns: repeat(2, 1fr);
+          gap: 10px;
         }
 
-        .gx-metrics-grid {
-          grid-template-columns: 1fr 1fr;
+        .gx-stat-card,
+        .gx-hero-card,
+        .gx-location-panel,
+        .gx-location-list-card,
+        .gx-testimonial-card,
+        .gx-bottom-card {
+          padding: 16px;
+          border-radius: 20px;
         }
 
-        .gx-cover {
-          height: 220px;
+        .gx-stat-card {
+          min-height: 90px;
         }
 
-        .gx-location-title,
-        .gx-card-title {
+        .gx-stat-value {
           font-size: 28px;
+        }
+
+        .gx-card-title,
+        .gx-location-title {
+          font-size: 26px;
         }
 
         .gx-globe-title,
@@ -685,62 +785,90 @@ function GlobalStyles() {
           font-size: 30px;
         }
 
-        .gx-testimonial-quote {
-          font-size: 19px;
+        .gx-globe-text,
+        .gx-card-text,
+        .gx-bottom-text,
+        .gx-bullet-row {
+          font-size: 14px;
+          line-height: 1.65;
         }
 
-        .gx-globe-card {
-          min-height: 500px;
+        .gx-cover {
+          height: 200px;
+          border-radius: 16px;
+        }
+
+        .gx-metrics-grid {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 8px;
+        }
+
+        .gx-mini-metric {
+          padding: 12px;
+          border-radius: 14px;
+        }
+
+        .gx-mini-value {
+          font-size: 20px;
+        }
+
+        .gx-location-btn {
+          padding: 12px;
+          border-radius: 14px;
+        }
+
+        .gx-testimonial-quote {
+          font-size: 18px;
+          line-height: 1.5;
+        }
+
+        .gx-globe-note {
+          display: block;
         }
       }
 
       @media (max-width: 520px) {
+        .gx-hero {
+          gap: 14px;
+        }
+
+        .gx-hero-title {
+          font-size: clamp(30px, 11vw, 44px);
+        }
+
         .gx-stats-grid,
         .gx-metrics-grid {
           grid-template-columns: 1fr;
         }
 
         .gx-filter-row {
-          gap: 6px;
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          width: 100%;
+          gap: 8px;
         }
 
         .gx-filter-btn {
-          padding: 9px 12px;
-          font-size: 13px;
+          width: 100%;
+          padding: 10px 10px;
+          font-size: 12px;
+          text-align: center;
         }
 
-        .gx-hero-title {
-          font-size: clamp(36px, 12vw, 54px);
+        .gx-globe-title {
+          font-size: 26px;
         }
 
-        .gx-hero-text {
-          font-size: 15px;
-          line-height: 1.65;
-        }
-
-        .gx-card-text,
-        .gx-bullet-row {
-          font-size: 14px;
-        }
-
-        .gx-cover {
-          height: 200px;
-        }
-
-        .gx-globe-card {
-          min-height: 430px;
-        }
-
-        .gx-stat-value {
+        .gx-bottom-title {
           font-size: 28px;
         }
 
-        .gx-bottom-card,
-        .gx-location-panel,
-        .gx-location-list-card,
-        .gx-hero-card,
-        .gx-testimonial-card {
-          padding: 18px;
+        .gx-cover {
+          height: 180px;
+        }
+
+        .gx-location-list {
+          max-height: 420px;
         }
       }
     `}</style>
@@ -748,7 +876,8 @@ function GlobalStyles() {
 }
 
 export default function App() {
-  const globeRef = useRef();
+  const globeRef = useRef(null);
+  const globeWrapRef = useRef(null);
 
   const [locations, setLocations] = useState([]);
   const [testimonials, setTestimonials] = useState([]);
@@ -756,6 +885,8 @@ export default function App() {
   const [activeFilter, setActiveFilter] = useState("all");
   const [selectedId, setSelectedId] = useState("");
   const [imageSrc, setImageSrc] = useState("");
+  const [globeSize, setGlobeSize] = useState({ width: 1200, height: 860 });
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     async function loadData() {
@@ -788,6 +919,38 @@ export default function App() {
     loadData();
   }, []);
 
+  useEffect(() => {
+    function updateGlobeSize() {
+      const width = globeWrapRef.current?.clientWidth || window.innerWidth || 1200;
+      const mobile = window.innerWidth <= 720;
+      const smallMobile = window.innerWidth <= 520;
+
+      let height = 860;
+      if (mobile) height = 500;
+      if (smallMobile) height = 420;
+
+      setIsMobile(mobile);
+      setGlobeSize({
+        width: Math.max(280, width),
+        height,
+      });
+    }
+
+    updateGlobeSize();
+
+    const resizeObserver = new ResizeObserver(() => {
+      updateGlobeSize();
+    });
+
+    if (globeWrapRef.current) resizeObserver.observe(globeWrapRef.current);
+    window.addEventListener("resize", updateGlobeSize);
+
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener("resize", updateGlobeSize);
+    };
+  }, []);
+
   const visibleLocations = useMemo(
     () => locations.filter((item) => getFilterMatch(item, activeFilter)),
     [locations, activeFilter]
@@ -801,6 +964,7 @@ export default function App() {
     if (!selected) return;
     const cover =
       selected.media?.cover ||
+      selected.cover ||
       selected.image ||
       createFallbackImage(selected.city);
     setImageSrc(cover);
@@ -834,13 +998,21 @@ export default function App() {
       liveLocations:
         globalStats?.liveLocations ?? totalsFromLocations.liveLocations,
       peopleHeardGospel:
-        globalStats?.peopleHeardGospel ?? globalStats?.heardGospel ?? totalsFromLocations.peopleHeardGospel,
+        globalStats?.peopleHeardGospel ??
+        globalStats?.heardGospel ??
+        totalsFromLocations.peopleHeardGospel,
       peopleSaidYesToJesus:
-        globalStats?.peopleSaidYesToJesus ?? globalStats?.salvations ?? totalsFromLocations.peopleSaidYesToJesus,
+        globalStats?.peopleSaidYesToJesus ??
+        globalStats?.salvations ??
+        totalsFromLocations.peopleSaidYesToJesus,
       healingsReported:
-        globalStats?.healingsReported ?? globalStats?.healings ?? totalsFromLocations.healingsReported,
+        globalStats?.healingsReported ??
+        globalStats?.healings ??
+        totalsFromLocations.healingsReported,
       testimoniesLogged:
-        globalStats?.testimoniesLogged ?? globalStats?.testimonies ?? totalsFromLocations.testimoniesLogged,
+        globalStats?.testimoniesLogged ??
+        globalStats?.testimonies ??
+        totalsFromLocations.testimoniesLogged,
     };
   }, [locations, globalStats]);
 
@@ -861,13 +1033,18 @@ export default function App() {
   useEffect(() => {
     if (!globeRef.current || !locations.length) return;
 
-    globeRef.current.pointOfView({ lat: 18, lng: 0, altitude: 1.8 }, 0);
-    globeRef.current.controls().autoRotate = true;
-    globeRef.current.controls().autoRotateSpeed = 0.18;
-    globeRef.current.controls().enablePan = false;
-    globeRef.current.controls().minDistance = 180;
-    globeRef.current.controls().maxDistance = 420;
-  }, [locations]);
+    globeRef.current.pointOfView(
+      { lat: isMobile ? 24 : 18, lng: 0, altitude: isMobile ? 2.15 : 1.8 },
+      0
+    );
+
+    const controls = globeRef.current.controls();
+    controls.autoRotate = true;
+    controls.autoRotateSpeed = isMobile ? 0.12 : 0.18;
+    controls.enablePan = false;
+    controls.minDistance = isMobile ? 220 : 180;
+    controls.maxDistance = isMobile ? 480 : 420;
+  }, [locations, isMobile, globeSize]);
 
   const focusLocation = (location) => {
     if (!location) return;
@@ -875,7 +1052,7 @@ export default function App() {
 
     if (!globeRef.current) return;
     globeRef.current.pointOfView(
-      { lat: location.lat, lng: location.lng, altitude: 1.22 },
+      { lat: location.lat, lng: location.lng, altitude: isMobile ? 1.7 : 1.22 },
       1400
     );
   };
@@ -1015,38 +1192,43 @@ export default function App() {
             </div>
           </div>
 
-          <div className="gx-globe-card">
+          <div className="gx-globe-card" ref={globeWrapRef}>
             <div className="gx-globe-aura"></div>
-            <Globe
-              ref={globeRef}
-              globeImageUrl="//unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
-              bumpImageUrl="//unpkg.com/three-globe/example/img/earth-topology.png"
-              backgroundColor="rgba(0,0,0,0)"
-              showAtmosphere={true}
-              atmosphereColor={GX.orange}
-              atmosphereAltitude={0.22}
-              pointsData={visibleLocations}
-              pointLat="lat"
-              pointLng="lng"
-              pointColor={(d) => getPointColor(d.status)}
-              pointAltitude={(d) => (d.status === "live" ? 0.26 : 0.16)}
-              pointRadius={(d) => (d.status === "live" ? 0.7 : 0.45)}
-              pointResolution={20}
-              pointsMerge={false}
-              arcsData={arcsData}
-              arcColor={"color"}
-              arcStroke={0.9}
-              arcAltitude={0.2}
-              arcDashLength={0.48}
-              arcDashGap={1.6}
-              arcDashAnimateTime={2800}
-              onPointClick={(point) => focusLocation(point)}
-              onPointHover={(point) => {
-                if (point?.id) setSelectedId(point.id);
-              }}
-              width={1280}
-              height={860}
-            />
+            <div className="gx-globe-stage">
+              <Globe
+                ref={globeRef}
+                globeImageUrl="//unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
+                bumpImageUrl="//unpkg.com/three-globe/example/img/earth-topology.png"
+                backgroundColor="rgba(0,0,0,0)"
+                showAtmosphere={true}
+                atmosphereColor={GX.orange}
+                atmosphereAltitude={0.22}
+                pointsData={visibleLocations}
+                pointLat="lat"
+                pointLng="lng"
+                pointColor={(d) => getPointColor(d.status)}
+                pointAltitude={(d) => (d.status === "live" ? 0.26 : 0.16)}
+                pointRadius={(d) => (d.status === "live" ? 0.7 : 0.45)}
+                pointResolution={20}
+                pointsMerge={false}
+                arcsData={arcsData}
+                arcColor={"color"}
+                arcStroke={0.9}
+                arcAltitude={0.2}
+                arcDashLength={0.48}
+                arcDashGap={1.6}
+                arcDashAnimateTime={2800}
+                onPointClick={(point) => focusLocation(point)}
+                onPointHover={(point) => {
+                  if (point?.id) setSelectedId(point.id);
+                }}
+                width={globeSize.width}
+                height={globeSize.height}
+              />
+            </div>
+            <div className="gx-globe-note">
+              Drag to rotate the globe. Pinch to zoom on mobile.
+            </div>
           </div>
 
           {selected && (
