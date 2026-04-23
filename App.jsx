@@ -1,202 +1,1108 @@
-import React, { useMemo, useState } from "react";
-import { motion } from "framer-motion";
-import { ComposableMap, Geographies, Geography, Marker, ZoomableGroup } from "react-simple-maps";
-import { scaleSqrt } from "d3-scale";
-import { Globe, MapPinned, Users, Cross, HeartHandshake, Radio, Filter, ArrowUpRight, Waves } from "lucide-react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import Globe from "react-globe.gl";
 
-const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
-const locations = [
-  { id: "kc", country: "United States", city: "Kansas City", region: "North America", coordinates: [-94.5786, 39.0997], status: "active", category: "training", year: 2026, peopleReached: 1200, salvations: 96, partners: 18, summary: "Base de envio, treinamento, mobilização e ativação evangelística com foco em discipulado e envio estratégico.", prayerFocus: "Ore por envio de trabalhadores, clareza estratégica e fogo missionário sustentável." },
-  { id: "sf", country: "United States", city: "San Francisco", region: "North America", coordinates: [-122.4194, 37.7749], status: "historic", category: "outreach", year: 2025, peopleReached: 840, salvations: 41, partners: 6, summary: "Outreach urbano com evangelismo criativo, performance, discipulado local e conexão com igrejas.", prayerFocus: "Ore por transformação nas ruas, jovens famintos por Deus e pontes com a igreja local." },
-  { id: "la", country: "United States", city: "Los Angeles", region: "North America", coordinates: [-118.2437, 34.0522], status: "historic", category: "outreach", year: 2025, peopleReached: 530, salvations: 24, partners: 4, summary: "Evangelismo público e ações em áreas de grande fluxo, com foco em presença profética e testemunho.", prayerFocus: "Ore por quebrantamento, unidade da igreja e portas abertas para proclamação pública." },
-  { id: "tirana", country: "Albania", city: "Tirana", region: "Europe", coordinates: [19.8187, 41.3275], status: "active", category: "outreach", year: 2026, peopleReached: 2100, salvations: 143, partners: 12, summary: "Campanha de escolas, mobilização evangelística e proclamação em massa conectada a parcerias locais.", prayerFocus: "Ore por boldness, favor em escolas, follow-up real e uma colheita que permaneça." },
-  { id: "pristina", country: "Kosovo", city: "Pristina", region: "Europe", coordinates: [21.1655, 42.6629], status: "upcoming", category: "prayer", year: 2026, peopleReached: 0, salvations: 0, partners: 3, summary: "Expansão para oração estratégica, conexões locais e possíveis ativações evangelísticas regionais.", prayerFocus: "Ore por favor, alianças certas e portas abertas para proclamação consistente." },
-  { id: "milan", country: "Italy", city: "Milan", region: "Europe", coordinates: [9.19, 45.4642], status: "historic", category: "outreach", year: 2026, peopleReached: 680, salvations: 33, partners: 5, summary: "Evangelismo relacional e criativo em espaços públicos durante temporada de grande fluxo internacional.", prayerFocus: "Ore por continuidade do fruto, relacionamentos e discipulado local após o contato inicial." },
-  { id: "sao-paulo", country: "Brazil", city: "São Paulo", region: "South America", coordinates: [-46.6333, -23.5505], status: "historic", category: "partner", year: 2024, peopleReached: 460, salvations: 19, partners: 7, summary: "Conexões ministeriais, mobilização e fortalecimento de relacionamento com igrejas e apoiadores.", prayerFocus: "Ore por expansão de parcerias, envio de equipes e base de sustentação saudável." },
-  { id: "cape-town", country: "South Africa", city: "Cape Town", region: "Africa", coordinates: [18.4241, -33.9249], status: "upcoming", category: "partner", year: 2026, peopleReached: 0, salvations: 0, partners: 2, summary: "Região em observação para futuras expressões de treinamento, parceria e evangelismo criativo.", prayerFocus: "Ore por discernimento, alianças certas e visão clara para os próximos passos." }
-];
-const statCards = [
-  { label: "Nações alcançadas", value: "25+", icon: Globe },
-  { label: "Estados nos EUA", value: "45", icon: MapPinned },
-  { label: "Pessoas alcançadas", value: "10K+", icon: Users },
-  { label: "Decisões por Jesus", value: "Milhares", icon: Cross }
-];
-const filters = ["all", "active", "historic", "upcoming"];
+const GX = {
+  orange: "#F4601A",
+  black: "#0D0D0D",
+  offWhite: "#FAFAF8",
+  softText: "rgba(250,250,248,0.72)",
+  softerText: "rgba(250,250,248,0.52)",
+  live: "#6EF3A5",
+  recent: "#FAFAF8",
+  historic: "#87A8FF",
+};
 
-function MetricMini({ label, value }) {
-  return <div className="mini-metric"><div className="mini-label">{label}</div><div className="mini-value">{value}</div></div>;
+function getPointColor(status) {
+  if (status === "live") return GX.live;
+  if (status === "recent") return GX.recent;
+  return GX.historic;
 }
-function SnapshotRow({ label, value }) {
-  return <div className="snapshot-row"><span>{label}</span><strong>{value}</strong></div>;
+
+function getFilterMatch(item, activeFilter) {
+  if (activeFilter === "all") return true;
+  if (activeFilter === "live") return item.status === "live";
+  if (activeFilter === "2026") return item.year === 2026;
+  if (activeFilter === "2025") return item.year === 2025;
+  if (activeFilter === "2024") return item.year === 2024;
+  return true;
+}
+
+function createFallbackImage(label) {
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700">
+      <defs>
+        <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+          <stop offset="0%" stop-color="#1b1b1b"/>
+          <stop offset="100%" stop-color="#0D0D0D"/>
+        </linearGradient>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#g)"/>
+      <circle cx="1010" cy="120" r="160" fill="rgba(244,96,26,0.24)"/>
+      <text x="68" y="330" fill="#FAFAF8" font-size="64" font-family="Arial, sans-serif" font-weight="700">${label}</text>
+      <text x="68" y="390" fill="#F4601A" font-size="28" font-family="Arial, sans-serif">GX International</text>
+    </svg>
+  `;
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+}
+
+function useCountUp(target, duration = 1400) {
+  const [value, setValue] = useState(0);
+
+  useEffect(() => {
+    let frameId;
+    const start = performance.now();
+
+    const tick = (now) => {
+      const progress = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setValue(Math.round(target * eased));
+      if (progress < 1) frameId = requestAnimationFrame(tick);
+    };
+
+    frameId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frameId);
+  }, [target, duration]);
+
+  return value;
+}
+
+function CountCard({ label, target }) {
+  const value = useCountUp(target);
+  return (
+    <div className="gx-stat-card">
+      <div className="gx-stat-label">{label}</div>
+      <div className="gx-stat-value">{value.toLocaleString()}</div>
+    </div>
+  );
+}
+
+function MiniMetric({ label, value }) {
+  return (
+    <div className="gx-mini-metric">
+      <div className="gx-mini-label">{label}</div>
+      <div className="gx-mini-value">{value.toLocaleString()}</div>
+    </div>
+  );
+}
+
+function TestimonialSlider({ testimonials }) {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    if (!testimonials.length) return;
+    const timer = setInterval(() => {
+      setIndex((prev) => (prev + 1) % testimonials.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [testimonials]);
+
+  if (!testimonials.length) return null;
+
+  return (
+    <div className="gx-testimonial-card">
+      <div className="gx-eyebrow">LIVE TESTIMONIES</div>
+      <p className="gx-testimonial-quote">“{testimonials[index].quote}”</p>
+      <div className="gx-testimonial-place">{testimonials[index].place}</div>
+    </div>
+  );
+}
+
+function GlobalStyles() {
+  return (
+    <style>{`
+      * { box-sizing: border-box; }
+      html, body, #root { margin: 0; min-height: 100%; background: #0D0D0D; }
+      button { font: inherit; }
+
+      @keyframes gxPulse {
+        0% { transform: translate(-50%, -50%) scale(0.96); opacity: 0.65; }
+        50% { transform: translate(-50%, -50%) scale(1.04); opacity: 1; }
+        100% { transform: translate(-50%, -50%) scale(0.96); opacity: 0.65; }
+      }
+
+      @keyframes gxFloat {
+        0% { transform: translateY(0px); opacity: 0.35; }
+        50% { transform: translateY(-14px); opacity: 0.8; }
+        100% { transform: translateY(0px); opacity: 0.35; }
+      }
+
+      .gx-page {
+        min-height: 100vh;
+        background:
+          radial-gradient(circle at 15% 10%, rgba(244,96,26,0.12), transparent 18%),
+          radial-gradient(circle at 86% 22%, rgba(244,96,26,0.08), transparent 22%),
+          #0D0D0D;
+        color: #FAFAF8;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .gx-glow-left {
+        position: absolute;
+        top: -180px;
+        left: -140px;
+        width: 520px;
+        height: 520px;
+        border-radius: 50%;
+        background: rgba(244,96,26,0.14);
+        filter: blur(120px);
+        pointer-events: none;
+      }
+
+      .gx-glow-right {
+        position: absolute;
+        top: 120px;
+        right: -180px;
+        width: 560px;
+        height: 560px;
+        border-radius: 50%;
+        background: rgba(244,96,26,0.08);
+        filter: blur(130px);
+        pointer-events: none;
+      }
+
+      .gx-particles {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        overflow: hidden;
+        z-index: 1;
+      }
+
+      .gx-particle {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: rgba(250,250,248,0.18);
+        box-shadow: 0 0 10px rgba(244,96,26,0.35);
+        animation: gxFloat 9s ease-in-out infinite;
+      }
+
+      .gx-container {
+        width: min(1480px, calc(100% - 40px));
+        margin: 0 auto;
+        position: relative;
+        z-index: 2;
+      }
+
+      .gx-hero {
+        padding: 52px 0 24px;
+        display: grid;
+        grid-template-columns: 1.18fr 0.82fr;
+        gap: 24px;
+        align-items: end;
+      }
+
+      .gx-eyebrow {
+        font-size: 12px;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: rgba(250,250,248,0.55);
+        margin-bottom: 14px;
+      }
+
+      .gx-hero-title {
+        margin: 0;
+        font-size: clamp(44px, 6vw, 86px);
+        line-height: 0.92;
+        letter-spacing: -0.065em;
+        white-space: normal;
+      }
+
+      .gx-hero-line {
+        display: block;
+        color: #FAFAF8;
+      }
+
+      .gx-hero-line-muted {
+        display: block;
+        color: rgba(250,250,248,0.62);
+      }
+
+      .gx-hero-text {
+        margin-top: 22px;
+        max-width: 820px;
+        color: rgba(250,250,248,0.8);
+        font-size: 18px;
+        line-height: 1.8;
+      }
+
+      .gx-button-row {
+        margin-top: 24px;
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .gx-primary-btn,
+      .gx-secondary-btn,
+      .gx-filter-btn,
+      .gx-location-btn {
+        appearance: none;
+        outline: none;
+      }
+
+      .gx-primary-btn {
+        background: #F4601A;
+        color: #FAFAF8;
+        border: 1px solid rgba(255,255,255,0.10);
+        border-radius: 18px;
+        padding: 14px 18px;
+        cursor: pointer;
+        font-weight: 700;
+      }
+
+      .gx-secondary-btn {
+        background: rgba(255,255,255,0.05);
+        color: #FAFAF8;
+        border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 18px;
+        padding: 14px 18px;
+        cursor: pointer;
+        font-weight: 700;
+      }
+
+      .gx-hero-card,
+      .gx-bottom-card,
+      .gx-testimonial-card,
+      .gx-stat-card,
+      .gx-location-panel,
+      .gx-location-list-card {
+        background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+        border: 1px solid rgba(255,255,255,0.10);
+        box-shadow: 0 0 40px rgba(244,96,26,0.06);
+      }
+
+      .gx-hero-card {
+        border-radius: 28px;
+        padding: 24px;
+        backdrop-filter: blur(18px);
+      }
+
+      .gx-card-title {
+        margin: 0;
+        font-size: 32px;
+        letter-spacing: -0.03em;
+      }
+
+      .gx-card-sub {
+        margin-top: 8px;
+        margin-bottom: 14px;
+        color: rgba(250,250,248,0.68);
+      }
+
+      .gx-card-text {
+        color: rgba(250,250,248,0.82);
+        line-height: 1.72;
+        font-size: 16px;
+      }
+
+      .gx-tag-row {
+        margin-top: 16px;
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .gx-tag {
+        border-radius: 999px;
+        padding: 8px 12px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.05);
+        color: #FAFAF8;
+        font-size: 12px;
+        text-transform: capitalize;
+      }
+
+      .gx-stats {
+        padding: 8px 0 22px;
+      }
+
+      .gx-stats-grid {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 12px;
+      }
+
+      .gx-stat-card {
+        border-radius: 22px;
+        padding: 18px;
+        min-height: 108px;
+      }
+
+      .gx-stat-label {
+        color: rgba(250,250,248,0.54);
+        font-size: 13px;
+        margin-bottom: 10px;
+      }
+
+      .gx-stat-value {
+        font-size: 34px;
+        font-weight: 700;
+        letter-spacing: -0.04em;
+      }
+
+      .gx-globe-section {
+        padding-bottom: 30px;
+      }
+
+      .gx-globe-header {
+        display: flex;
+        justify-content: space-between;
+        gap: 18px;
+        align-items: flex-end;
+        margin-bottom: 18px;
+      }
+
+      .gx-globe-title {
+        margin: 0;
+        font-size: 40px;
+        letter-spacing: -0.04em;
+      }
+
+      .gx-globe-text {
+        color: rgba(250,250,248,0.74);
+        line-height: 1.7;
+        max-width: 760px;
+        margin-top: 12px;
+      }
+
+      .gx-filter-row {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .gx-filter-btn {
+        border-radius: 999px;
+        padding: 10px 14px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.05);
+        color: #FAFAF8;
+        cursor: pointer;
+      }
+
+      .gx-filter-btn.active {
+        background: #F4601A;
+        color: #FAFAF8;
+        border-color: rgba(255,255,255,0.08);
+      }
+
+      .gx-globe-card {
+        min-height: 860px;
+        border-radius: 30px;
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: radial-gradient(circle at center, rgba(244,96,26,0.16), rgba(255,255,255,0.06) 36%, rgba(255,255,255,0.02) 62%);
+        backdrop-filter: blur(20px);
+        box-shadow: 0 0 80px rgba(244,96,26,0.12);
+        position: relative;
+      }
+
+      .gx-globe-aura {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 520px;
+        height: 520px;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        background: rgba(244,96,26,0.18);
+        filter: blur(100px);
+        pointer-events: none;
+        z-index: 0;
+        animation: gxPulse 5.2s ease-in-out infinite;
+      }
+
+      .gx-location-section {
+        margin-top: 18px;
+        display: grid;
+        grid-template-columns: 1fr 0.8fr;
+        gap: 18px;
+        align-items: stretch;
+      }
+
+      .gx-location-panel,
+      .gx-location-list-card {
+        border-radius: 28px;
+        padding: 22px;
+        backdrop-filter: blur(18px);
+      }
+
+      .gx-location-title {
+        margin: 0;
+        font-size: 34px;
+        letter-spacing: -0.03em;
+      }
+
+      .gx-location-sub {
+        margin-top: 8px;
+        color: rgba(250,250,248,0.70);
+      }
+
+      .gx-cover {
+        width: 100%;
+        height: 320px;
+        object-fit: cover;
+        border-radius: 22px;
+        margin-top: 18px;
+        border: 1px solid rgba(255,255,255,0.08);
+        background: #181818;
+      }
+
+      .gx-metrics-grid {
+        margin-top: 18px;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+      }
+
+      .gx-mini-metric {
+        border-radius: 18px;
+        border: 1px solid rgba(255,255,255,0.10);
+        background: rgba(0,0,0,0.18);
+        padding: 14px;
+      }
+
+      .gx-mini-label {
+        color: rgba(250,250,248,0.48);
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        margin-bottom: 10px;
+      }
+
+      .gx-mini-value {
+        font-size: 24px;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+      }
+
+      .gx-section-block {
+        margin-top: 22px;
+      }
+
+      .gx-bullet-list {
+        display: grid;
+        gap: 12px;
+        margin-top: 14px;
+      }
+
+      .gx-bullet-row {
+        display: flex;
+        gap: 10px;
+        color: rgba(250,250,248,0.82);
+        line-height: 1.6;
+        align-items: flex-start;
+      }
+
+      .gx-bullet-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: #F4601A;
+        margin-top: 9px;
+        flex-shrink: 0;
+      }
+
+      .gx-location-list {
+        display: grid;
+        gap: 10px;
+        margin-top: 14px;
+        max-height: 560px;
+        overflow-y: auto;
+        padding-right: 4px;
+      }
+
+      .gx-location-btn {
+        width: 100%;
+        border-radius: 18px;
+        border: 1px solid rgba(255,255,255,0.10);
+        background: rgba(255,255,255,0.03);
+        color: #FAFAF8;
+        padding: 14px;
+        cursor: pointer;
+        text-align: left;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .gx-location-btn.active {
+        background: rgba(244,96,26,0.12);
+        border-color: rgba(244,96,26,0.28);
+      }
+
+      .gx-location-name {
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+
+      .gx-location-meta {
+        color: rgba(250,250,248,0.52);
+        font-size: 13px;
+      }
+
+      .gx-location-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        flex-shrink: 0;
+      }
+
+      .gx-testimonial-wrap {
+        margin-top: 18px;
+      }
+
+      .gx-testimonial-card {
+        border-radius: 24px;
+        padding: 24px;
+      }
+
+      .gx-testimonial-quote {
+        margin: 0;
+        font-size: 24px;
+        line-height: 1.6;
+        color: #FAFAF8;
+        max-width: 980px;
+      }
+
+      .gx-testimonial-place {
+        margin-top: 14px;
+        color: #F4601A;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+      }
+
+      .gx-bottom {
+        padding-bottom: 60px;
+      }
+
+      .gx-bottom-card {
+        border-radius: 28px;
+        padding: 28px;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 20px;
+        align-items: center;
+      }
+
+      .gx-bottom-title {
+        margin: 0;
+        font-size: 42px;
+        letter-spacing: -0.04em;
+      }
+
+      .gx-bottom-text {
+        margin-top: 14px;
+        color: rgba(250,250,248,0.76);
+        line-height: 1.7;
+        max-width: 780px;
+      }
+
+      @media (max-width: 1280px) {
+        .gx-stats-grid {
+          grid-template-columns: repeat(3, 1fr);
+        }
+
+        .gx-location-section {
+          grid-template-columns: 1fr;
+        }
+
+        .gx-metrics-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .gx-globe-card {
+          min-height: 760px;
+        }
+      }
+
+      @media (max-width: 980px) {
+        .gx-hero {
+          grid-template-columns: 1fr;
+        }
+
+        .gx-globe-header {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .gx-bottom-card {
+          grid-template-columns: 1fr;
+        }
+
+        .gx-hero-title {
+          font-size: clamp(42px, 12vw, 72px);
+        }
+
+        .gx-globe-card {
+          min-height: 620px;
+        }
+
+        .gx-cover {
+          height: 260px;
+        }
+      }
+
+      @media (max-width: 720px) {
+        .gx-container {
+          width: min(100% - 20px, 1480px);
+        }
+
+        .gx-hero {
+          padding-top: 34px;
+        }
+
+        .gx-stats-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .gx-metrics-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .gx-cover {
+          height: 220px;
+        }
+
+        .gx-location-title,
+        .gx-card-title {
+          font-size: 28px;
+        }
+
+        .gx-globe-title,
+        .gx-bottom-title {
+          font-size: 30px;
+        }
+
+        .gx-testimonial-quote {
+          font-size: 19px;
+        }
+
+        .gx-globe-card {
+          min-height: 500px;
+        }
+      }
+
+      @media (max-width: 520px) {
+        .gx-stats-grid,
+        .gx-metrics-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .gx-filter-row {
+          gap: 6px;
+        }
+
+        .gx-filter-btn {
+          padding: 9px 12px;
+          font-size: 13px;
+        }
+
+        .gx-hero-title {
+          font-size: clamp(36px, 12vw, 54px);
+        }
+
+        .gx-hero-text {
+          font-size: 15px;
+          line-height: 1.65;
+        }
+
+        .gx-card-text,
+        .gx-bullet-row {
+          font-size: 14px;
+        }
+
+        .gx-cover {
+          height: 200px;
+        }
+
+        .gx-globe-card {
+          min-height: 430px;
+        }
+
+        .gx-stat-value {
+          font-size: 28px;
+        }
+
+        .gx-bottom-card,
+        .gx-location-panel,
+        .gx-location-list-card,
+        .gx-hero-card,
+        .gx-testimonial-card {
+          padding: 18px;
+        }
+      }
+    `}</style>
+  );
 }
 
 export default function App() {
-  const [selectedId, setSelectedId] = useState("tirana");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [query, setQuery] = useState("");
-  const [position, setPosition] = useState({ coordinates: [12, 18], zoom: 1 });
-  const sizeScale = useMemo(() => scaleSqrt().domain([0, 2200]).range([5, 22]), []);
+  const globeRef = useRef();
+  const [locations, setLocations] = useState([]);
+  const [testimonials, setTestimonials] = useState([]);
+  const [globalStats, setGlobalStats] = useState(null);
+  const [activeFilter, setActiveFilter] = useState("all");
+  const [selectedId, setSelectedId] = useState("");
+  const [imageSrc, setImageSrc] = useState("");
 
-  const visibleLocations = useMemo(() => locations.filter((item) => {
-    const statusMatch = statusFilter === "all" ? true : item.status === statusFilter;
-    const queryMatch = [item.city, item.country, item.region, item.category].join(" ").toLowerCase().includes(query.toLowerCase());
-    return statusMatch && queryMatch;
-  }), [statusFilter, query]);
+  useEffect(() => {
+    async function loadData() {
+      const [locationsRes, testimonialsRes, statsRes] = await Promise.all([
+        fetch("/data/locations.json"),
+        fetch("/data/testimonials.json"),
+        fetch("/data/global-stats.json"),
+      ]);
 
-  const selected = visibleLocations.find((item) => item.id === selectedId) ?? visibleLocations[0] ?? locations[0];
-  const totals = useMemo(() => visibleLocations.reduce((acc, item) => {
-    acc.peopleReached += item.peopleReached;
-    acc.salvations += item.salvations;
-    acc.partners += item.partners;
-    return acc;
-  }, { peopleReached: 0, salvations: 0, partners: 0 }), [visibleLocations]);
+      const [locationsData, testimonialsData, statsData] = await Promise.all([
+        locationsRes.json(),
+        testimonialsRes.json(),
+        statsRes.json(),
+      ]);
 
-  const focusLocation = (item) => {
-    setSelectedId(item.id);
-    setPosition({ coordinates: item.coordinates, zoom: 3.2 });
+      setLocations(locationsData);
+      setTestimonials(testimonialsData);
+      setGlobalStats(statsData);
+
+      if (locationsData.length) {
+        const tirana = locationsData.find((item) => item.id === "tirana");
+        setSelectedId((tirana || locationsData[0]).id);
+      }
+    }
+
+    loadData();
+  }, []);
+
+  const visibleLocations = useMemo(
+    () => locations.filter((item) => getFilterMatch(item, activeFilter)),
+    [locations, activeFilter]
+  );
+
+  const selected =
+    locations.find((item) => item.id === selectedId) || locations[0] || null;
+
+  useEffect(() => {
+    if (!selected) return;
+    setImageSrc(selected.media?.cover || createFallbackImage(selected.city));
+  }, [selected]);
+
+  const arcsData = useMemo(() => {
+    const kc = locations.find((item) => item.id === "kansas-city");
+    if (!kc) return [];
+    return locations
+      .filter((item) => item.id !== "kansas-city")
+      .map((item) => ({
+        startLat: kc.lat,
+        startLng: kc.lng,
+        endLat: item.lat,
+        endLng: item.lng,
+        color: [GX.orange, GX.orange],
+      }));
+  }, [locations]);
+
+  useEffect(() => {
+    if (!globeRef.current || !locations.length) return;
+
+    globeRef.current.pointOfView({ lat: 18, lng: 0, altitude: 1.8 }, 0);
+    globeRef.current.controls().autoRotate = true;
+    globeRef.current.controls().autoRotateSpeed = 0.18;
+    globeRef.current.controls().enablePan = false;
+    globeRef.current.controls().minDistance = 180;
+    globeRef.current.controls().maxDistance = 420;
+  }, [locations]);
+
+  const focusLocation = (location) => {
+    setSelectedId(location.id);
+
+    if (!globeRef.current) return;
+
+    globeRef.current.pointOfView(
+      { lat: location.lat, lng: location.lng, altitude: 1.22 },
+      1400
+    );
   };
 
+  if (!globalStats || !selected) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          background: GX.black,
+          color: GX.offWhite,
+          display: "grid",
+          placeItems: "center",
+          fontFamily: "Inter, sans-serif",
+        }}
+      >
+        Loading GX Global Map...
+      </div>
+    );
+  }
+
   return (
-    <div className="page">
-      <section className="hero">
-        <div className="container hero-grid">
+    <div className="gx-page">
+      <GlobalStyles />
+
+      <div className="gx-glow-left"></div>
+      <div className="gx-glow-right"></div>
+
+      <div className="gx-particles">
+        {Array.from({ length: 22 }).map((_, i) => (
+          <span
+            key={i}
+            className="gx-particle"
+            style={{
+              left: `${(i * 4.3) % 96}%`,
+              top: `${(i * 13.7) % 88}%`,
+              animationDelay: `${i * 0.4}s`,
+            }}
+          />
+        ))}
+      </div>
+
+      <div className="gx-container">
+        <section className="gx-hero">
           <div>
-            <div className="badge">GX INTERNATIONAL · GLOBAL IMPACT MAP</div>
-            <h1>Reaching the lost, <span>no matter the cost.</span></h1>
-            <p className="hero-text">Um mapa global interativo para visualizar presença, impacto, campanhas, parcerias e frentes de oração do GX International com estética premium, narrativa missionária e leitura clara para mobilização.</p>
-            <div className="cta-row">
-              <button className="btn btn-light">Explore the map</button>
-              <button className="btn btn-dark">Become a partner</button>
+            <div className="gx-eyebrow">GX INTERNATIONAL · GLOBAL MOVEMENT</div>
+
+            <h1 className="gx-hero-title">
+              <span className="gx-hero-line">REACHING THE LOST</span>
+              <span className="gx-hero-line-muted">NO MATTER THE COST</span>
+            </h1>
+
+            <p className="gx-hero-text">
+              A living global experience of where GX has been, where teams are
+              active now, and where the gospel is moving through outreach,
+              training, discipleship and mission.
+            </p>
+
+            <div className="gx-button-row">
+              <button className="gx-primary-btn">Explore the Movement</button>
+              <button className="gx-secondary-btn">Become a Partner</button>
             </div>
           </div>
 
-          <div className="card featured-card">
-            <div className="card-top">
-              <div><div className="eyebrow">Current focus</div><h3>{selected.city}, {selected.country}</h3></div>
-              <div className={`status-pill ${selected.status}`}>{selected.status}</div>
-            </div>
-            <p className="muted">{selected.summary}</p>
-            <div className="mini-grid">
-              <MetricMini label="Reached" value={selected.peopleReached.toLocaleString()} />
-              <MetricMini label="Yes to Jesus" value={selected.salvations.toLocaleString()} />
-              <MetricMini label="Partners" value={selected.partners.toLocaleString()} />
+          <div className="gx-hero-card">
+            <div className="gx-eyebrow">LIVE FOCUS</div>
+            <h3 className="gx-card-title">{selected.city}</h3>
+            <p className="gx-card-sub">
+              {selected.country} · {selected.region}
+            </p>
+            <p className="gx-card-text">{selected.summary}</p>
+
+            <div className="gx-tag-row">
+              <span className="gx-tag">{selected.year}</span>
+              <span className="gx-tag">{selected.type}</span>
+              <span className="gx-tag">
+                {selected.status === "live" ? "Live Now" : selected.status}
+              </span>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section className="container stats">
-        {statCards.map((item) => {
-          const Icon = item.icon;
-          return <div className="card stat-card" key={item.label}><div><div className="muted">{item.label}</div><div className="stat-value">{item.value}</div></div><div className="icon-wrap"><Icon size={20} /></div></div>;
-        })}
-      </section>
+        <section className="gx-stats">
+          <div className="gx-stats-grid">
+            <CountCard
+              label="Tracked Locations"
+              target={globalStats.trackedLocations}
+            />
+            <CountCard
+              label="Live Locations"
+              target={globalStats.liveLocations}
+            />
+            <CountCard
+              label="People Heard Gospel"
+              target={globalStats.peopleHeardGospel}
+            />
+            <CountCard
+              label="People Said Yes to Jesus"
+              target={globalStats.peopleSaidYesToJesus}
+            />
+            <CountCard
+              label="Healings Reported"
+              target={globalStats.healingsReported}
+            />
+            <CountCard
+              label="Testimonies Logged"
+              target={globalStats.testimoniesLogged}
+            />
+          </div>
+        </section>
 
-      <section className="container map-layout">
-        <div className="card map-card">
-          <div className="map-toolbar">
+        <section className="gx-globe-section">
+          <div className="gx-globe-header">
             <div>
-              <h2>Global presence and movement</h2>
-              <p className="muted">Visualize activity by region, recent campaigns, strategic prayer points and ministry footprint.</p>
+              <div className="gx-eyebrow">INTERACTIVE GLOBE</div>
+              <h2 className="gx-globe-title">GX Global Impact in Motion</h2>
+              <p className="gx-globe-text">
+                Explore active fields, recent outreaches and historic mission
+                footprint across the nations.
+              </p>
             </div>
-            <div className="toolbar-right">
-              <div className="search-box"><Filter size={16} /><input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search country, city, region..." /></div>
-              <div className="filter-row">
-                {filters.map((item) => <button key={item} className={`filter-chip ${statusFilter === item ? "active" : ""}`} onClick={() => setStatusFilter(item)}>{item}</button>)}
-              </div>
-            </div>
-          </div>
 
-          <div className="map-shell">
-            <ComposableMap projection="geoMercator" projectionConfig={{ scale: 140 }}>
-              <ZoomableGroup zoom={position.zoom} center={position.coordinates} onMoveEnd={(pos) => setPosition({ coordinates: pos.coordinates, zoom: pos.zoom })}>
-                <Geographies geography={geoUrl}>
-                  {({ geographies }) => geographies.map((geo) => (
-                    <Geography key={geo.rsmKey} geography={geo} fill="#141821" stroke="#2A3142" strokeWidth={0.5}
-                      style={{ default: { outline: "none" }, hover: { fill: "#1E2634", outline: "none" }, pressed: { outline: "none" } }} />
-                  ))}
-                </Geographies>
-
-                {visibleLocations.map((item) => {
-                  const isSelected = selected.id === item.id;
-                  const size = sizeScale(Math.max(item.peopleReached, 180));
-                  const fill = item.status === "active" ? "#FFFFFF" : item.status === "upcoming" ? "#70F3C0" : "#7FA7FF";
-                  return (
-                    <Marker key={item.id} coordinates={item.coordinates}>
-                      <g className="marker-group" onClick={() => focusLocation(item)}>
-                        <motion.circle r={isSelected ? size + 8 : size + 4} fill="rgba(255,255,255,0.08)" animate={{ opacity: isSelected ? 0.8 : 0.35, scale: isSelected ? 1.12 : 1 }} transition={{ duration: 0.4 }} />
-                        <motion.circle r={size} fill={fill} animate={{ scale: isSelected ? 1.06 : 1 }} transition={{ duration: 0.25 }} />
-                        <circle r={2.2} fill="#0A0A0A" />
-                      </g>
-                    </Marker>
-                  );
-                })}
-              </ZoomableGroup>
-            </ComposableMap>
-            <div className="legend">
-              <span><i className="dot active" /> Active</span>
-              <span><i className="dot historic" /> Historic</span>
-              <span><i className="dot upcoming" /> Upcoming</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="side-stack">
-          <div className="card side-card">
-            <h3>Region snapshot</h3>
-            <div className="stack-list">
-              <SnapshotRow label="People Heard Gospel" value={totals.peopleReached.toLocaleString()} />
-              <SnapshotRow label="People Said Yes to Jesus" value={totals.salvations.toLocaleString()} />
-              <SnapshotRow label="Strategic Partners" value={totals.partners.toLocaleString()} />
-              <SnapshotRow label="Visible Locations" value={String(visibleLocations.length)} />
-            </div>
-          </div>
-
-          <div className="card side-card">
-            <div className="side-header">
-              <div><h3>{selected.city}</h3><div className="muted small">{selected.country} · {selected.region}</div></div>
-              <div className="year-pill">{selected.year}</div>
-            </div>
-            <div className="mini-grid">
-              <MetricMini label="Reached" value={selected.peopleReached.toLocaleString()} />
-              <MetricMini label="Yes" value={selected.salvations.toLocaleString()} />
-              <MetricMini label="Partners" value={selected.partners.toLocaleString()} />
-            </div>
-            <div><div className="eyebrow">Summary</div><p className="muted">{selected.summary}</p></div>
-            <div><div className="eyebrow">Prayer focus</div><p className="muted">{selected.prayerFocus}</p></div>
-            <button className="btn btn-light full">View full field report <ArrowUpRight size={16} /></button>
-          </div>
-
-          <div className="card side-card">
-            <h3>Locations</h3>
-            <div className="locations-list">
-              {visibleLocations.map((item) => (
-                <button key={item.id} className={`location-item ${selected.id === item.id ? "selected" : ""}`} onClick={() => focusLocation(item)}>
-                  <div className="location-top">
-                    <div><div className="location-title">{item.city}, {item.country}</div><div className="muted small">{item.region} · {item.category}</div></div>
-                    <div className="status-pill slim">{item.status}</div>
-                  </div>
-                  <div className="location-bottom muted small"><span>{item.peopleReached.toLocaleString()} reached</span><span>{item.salvations.toLocaleString()} yes</span></div>
+            <div className="gx-filter-row">
+              {filters.map((filter) => (
+                <button
+                  key={filter.id}
+                  onClick={() => setActiveFilter(filter.id)}
+                  className={`gx-filter-btn ${
+                    activeFilter === filter.id ? "active" : ""
+                  }`}
+                >
+                  {filter.label}
                 </button>
               ))}
             </div>
           </div>
-        </div>
-      </section>
 
-      <section className="container bottom-cta">
-        <div className="card cta-card">
-          <div>
-            <div className="cta-eyebrow"><Waves size={18} /> Mobilize · Pray · Give · Go</div>
-            <h2>This is more than a map. It is a call to action.</h2>
-            <p className="muted">Transforme esse módulo em uma ferramenta de visão: cada ponto do mapa pode abrir relatórios, vídeos, testemunhos, fotos, pedidos de oração, botões de doação e chamadas para participação missionária.</p>
+          <div className="gx-globe-card">
+            <div className="gx-globe-aura"></div>
+            <Globe
+              ref={globeRef}
+              globeImageUrl="//unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
+              bumpImageUrl="//unpkg.com/three-globe/example/img/earth-topology.png"
+              backgroundColor="rgba(0,0,0,0)"
+              showAtmosphere={true}
+              atmosphereColor={GX.orange}
+              atmosphereAltitude={0.22}
+              pointsData={visibleLocations}
+              pointLat="lat"
+              pointLng="lng"
+              pointColor={(d) => getPointColor(d.status)}
+              pointAltitude={(d) => (d.status === "live" ? 0.26 : 0.16)}
+              pointRadius={(d) => (d.status === "live" ? 0.7 : 0.45)}
+              pointResolution={20}
+              pointsMerge={false}
+              arcsData={arcsData}
+              arcColor={"color"}
+              arcStroke={0.9}
+              arcAltitude={0.2}
+              arcDashLength={0.48}
+              arcDashGap={1.6}
+              arcDashAnimateTime={2800}
+              onPointClick={(point) => focusLocation(point)}
+              onPointHover={(point) => {
+                if (point?.id) setSelectedId(point.id);
+              }}
+              width={1280}
+              height={860}
+            />
           </div>
-          <div className="cta-row">
-            <button className="btn btn-light"><HeartHandshake size={16} /> Become a partner</button>
-            <button className="btn btn-dark"><Radio size={16} /> Submit report</button>
+
+          <div className="gx-location-section">
+            <div className="gx-location-panel">
+              <div className="gx-eyebrow">SELECTED LOCATION</div>
+              <h3 className="gx-location-title">{selected.city}</h3>
+              <p className="gx-location-sub">
+                {selected.country} · {selected.region}
+              </p>
+
+              <img
+                src={imageSrc}
+                alt={selected.city}
+                className="gx-cover"
+                onError={() => setImageSrc(createFallbackImage(selected.city))}
+              />
+
+              <div className="gx-tag-row">
+                <span className="gx-tag">{selected.year}</span>
+                <span className="gx-tag">{selected.type}</span>
+                <span className="gx-tag">
+                  {selected.status === "live" ? "Live Now" : selected.status}
+                </span>
+              </div>
+
+              <p className="gx-card-text">{selected.summary}</p>
+
+              <div className="gx-metrics-grid">
+                <MiniMetric
+                  label="Heard Gospel"
+                  value={selected.stats.heardGospel}
+                />
+                <MiniMetric label="Salvations" value={selected.stats.salvations} />
+                <MiniMetric label="Healings" value={selected.stats.healings} />
+                <MiniMetric
+                  label="Testimonies"
+                  value={selected.stats.testimonies}
+                />
+              </div>
+
+              <div className="gx-section-block">
+                <div className="gx-eyebrow">PRAYER FOCUS</div>
+                <div className="gx-bullet-list">
+                  {selected.prayerFocus.map((item) => (
+                    <div key={item} className="gx-bullet-row">
+                      <span className="gx-bullet-dot"></span>
+                      <span>{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="gx-location-list-card">
+              <div className="gx-eyebrow">LOCATIONS</div>
+              <div className="gx-location-list">
+                {visibleLocations.map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => focusLocation(item)}
+                    className={`gx-location-btn ${
+                      selected.id === item.id ? "active" : ""
+                    }`}
+                  >
+                    <div>
+                      <div className="gx-location-name">{item.city}</div>
+                      <div className="gx-location-meta">
+                        {item.country} · {item.year}
+                      </div>
+                    </div>
+                    <span
+                      className="gx-location-dot"
+                      style={{
+                        background:
+                          item.status === "live"
+                            ? GX.live
+                            : item.status === "recent"
+                            ? GX.offWhite
+                            : GX.historic,
+                      }}
+                    ></span>
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
-        </div>
-      </section>
+
+          <div className="gx-testimonial-wrap">
+            <TestimonialSlider testimonials={testimonials} />
+          </div>
+        </section>
+
+        <section className="gx-bottom">
+          <div className="gx-bottom-card">
+            <div>
+              <div className="gx-eyebrow">MORE THAN A MAP</div>
+              <h2 className="gx-bottom-title">
+                This is an invitation into the movement.
+              </h2>
+              <p className="gx-bottom-text">
+                Explore the nations, follow the field, pray with us, give into
+                the vision, and help fuel a ministry that is always in motion.
+              </p>
+            </div>
+
+            <div className="gx-button-row">
+              <button className="gx-primary-btn">Join the Mission</button>
+              <button className="gx-secondary-btn">Give to the Vision</button>
+            </div>
+          </div>
+        </section>
+      </div>
     </div>
   );
 }
