@@ -5,346 +5,17 @@ const GX = {
   orange: "#F4601A",
   black: "#0D0D0D",
   offWhite: "#FAFAF8",
-  warmGray: "#F0EDE8",
-  softText: "rgba(250,250,248,0.72)",
-  softerText: "rgba(250,250,248,0.52)",
-  border: "rgba(255,255,255,0.10)",
-  panel: "rgba(255,255,255,0.04)",
-  panelStrong: "rgba(255,255,255,0.06)",
   live: "#6EF3A5",
   recent: "#FAFAF8",
   historic: "#87A8FF",
 };
 
-const locations = [
-  {
-    id: "kansas-city",
-    city: "Kansas City",
-    country: "United States",
-    region: "North America",
-    lat: 39.0997,
-    lng: -94.5786,
-    year: 2026,
-    status: "live",
-    type: "base",
-    title: "GX Base Hub",
-    summary:
-      "Current sending base and training hub. Mobilization, discipleship, mission preparation and team activation.",
-    prayerFocus: [
-      "Training and sending",
-      "Mobilization of laborers",
-      "Discipleship and activation",
-    ],
-    stats: {
-      heardGospel: 4280,
-      salvations: 690,
-      healings: 37,
-      testimonies: 24,
-    },
-    media: {
-      cover:
-        "https://upload.wikimedia.org/wikipedia/commons/0/0b/Kansas_City_skyline.jpg",
-    },
-  },
-  {
-    id: "tirana",
-    city: "Tirana",
-    country: "Albania",
-    region: "Europe",
-    lat: 41.3275,
-    lng: 19.8187,
-    year: 2026,
-    status: "live",
-    type: "outreach",
-    title: "Team on the Ground Now",
-    summary:
-      "GX team currently active in Tirana with outreach, evangelism and city impact.",
-    prayerFocus: [
-      "Street evangelism",
-      "School-related outreach focus",
-      "City proclamation and follow-up",
-    ],
-    stats: {
-      heardGospel: 2100,
-      salvations: 143,
-      healings: 11,
-      testimonies: 16,
-    },
-    media: {
-      cover:
-        "https://upload.wikimedia.org/wikipedia/commons/5/5d/Tirana_from_the_sky.jpg",
-    },
-  },
-  {
-    id: "milan",
-    city: "Milan",
-    country: "Italy",
-    region: "Europe",
-    lat: 45.4642,
-    lng: 9.19,
-    year: 2026,
-    status: "recent",
-    type: "outreach",
-    title: "Italy Outreach",
-    summary:
-      "GX was in Milan in February 2026 for evangelism and international ministry presence.",
-    prayerFocus: [
-      "Creative evangelism",
-      "European mission presence",
-      "Open hearts for Jesus",
-    ],
-    stats: {
-      heardGospel: 680,
-      salvations: 33,
-      healings: 3,
-      testimonies: 7,
-    },
-    media: {
-      cover:
-        "https://upload.wikimedia.org/wikipedia/commons/e/e6/Milan_skyline.jpg",
-    },
-  },
-  {
-    id: "san-francisco",
-    city: "San Francisco",
-    country: "United States",
-    region: "North America",
-    lat: 37.7749,
-    lng: -122.4194,
-    year: 2025,
-    status: "recent",
-    type: "outreach",
-    title: "California Tour",
-    summary: "Part of the 2025 California outreach movement.",
-    prayerFocus: [
-      "Evangelism in the city",
-      "Bold witness",
-      "Long-term fruit",
-    ],
-    stats: { heardGospel: 840, salvations: 41, healings: 6, testimonies: 8 },
-    media: {
-      cover:
-        "https://upload.wikimedia.org/wikipedia/commons/a/af/San_Francisco_from_the_Marin_Headlands_in_August_2022.jpg",
-    },
-  },
-  {
-    id: "santa-cruz",
-    city: "Santa Cruz",
-    country: "United States",
-    region: "North America",
-    lat: 36.9741,
-    lng: -122.0308,
-    year: 2025,
-    status: "recent",
-    type: "outreach",
-    title: "California Tour",
-    summary: "Part of the 2025 California outreach movement.",
-    prayerFocus: [
-      "Gospel conversations",
-      "Open doors",
-      "Strong follow-up",
-    ],
-    stats: { heardGospel: 420, salvations: 19, healings: 2, testimonies: 5 },
-    media: {
-      cover:
-        "https://upload.wikimedia.org/wikipedia/commons/7/79/Santa_Cruz_Boardwalk_aerial.jpg",
-    },
-  },
-  {
-    id: "los-angeles",
-    city: "Los Angeles",
-    country: "United States",
-    region: "North America",
-    lat: 34.0522,
-    lng: -118.2437,
-    year: 2025,
-    status: "recent",
-    type: "outreach",
-    title: "California Tour",
-    summary: "Part of the 2025 California outreach movement.",
-    prayerFocus: [
-      "Creative evangelism",
-      "Youth outreach",
-      "Kingdom connections",
-    ],
-    stats: { heardGospel: 530, salvations: 24, healings: 3, testimonies: 6 },
-    media: {
-      cover:
-        "https://upload.wikimedia.org/wikipedia/commons/8/89/Los_Angeles%2C_Winter_2016.jpg",
-    },
-  },
-  {
-    id: "san-diego",
-    city: "San Diego",
-    country: "United States",
-    region: "North America",
-    lat: 32.7157,
-    lng: -117.1611,
-    year: 2025,
-    status: "recent",
-    type: "outreach",
-    title: "California Tour",
-    summary: "Part of the 2025 California outreach movement.",
-    prayerFocus: [
-      "Evangelism presence",
-      "Unity with local church",
-      "Transformation in the city",
-    ],
-    stats: { heardGospel: 610, salvations: 29, healings: 4, testimonies: 7 },
-    media: {
-      cover:
-        "https://upload.wikimedia.org/wikipedia/commons/5/53/San_Diego_skyline_at_night.jpg",
-    },
-  },
-  {
-    id: "cape-town",
-    city: "Cape Town",
-    country: "South Africa",
-    region: "Africa",
-    lat: -33.9249,
-    lng: 18.4241,
-    year: 2025,
-    status: "recent",
-    type: "outreach",
-    title: "Multiple 2025 Activations",
-    summary:
-      "GX was in Cape Town in February, October and November 2025.",
-    prayerFocus: [
-      "Ongoing fruit",
-      "Kingdom relationships",
-      "Revival in the city",
-    ],
-    stats: { heardGospel: 970, salvations: 51, healings: 9, testimonies: 9 },
-    media: {
-      cover:
-        "https://upload.wikimedia.org/wikipedia/commons/a/af/Cape_Town_CBD.jpg",
-    },
-  },
-  {
-    id: "newark",
-    city: "Newark",
-    country: "United States",
-    region: "North America",
-    lat: 40.7357,
-    lng: -74.1724,
-    year: 2025,
-    status: "recent",
-    type: "outreach",
-    title: "Outreach + Microtraining",
-    summary:
-      "Outreach with evangelism, presentation and a microtraining expression.",
-    prayerFocus: [
-      "Evangelism outreach",
-      "Training multiplication",
-      "Boldness and follow-up",
-    ],
-    stats: { heardGospel: 360, salvations: 18, healings: 1, testimonies: 4 },
-    media: {
-      cover:
-        "https://upload.wikimedia.org/wikipedia/commons/7/73/Newark_Panorama.jpg",
-    },
-  },
-  {
-    id: "maysville",
-    city: "Maysville",
-    country: "United States",
-    region: "North America",
-    lat: 38.6412,
-    lng: -83.7449,
-    year: 2025,
-    status: "recent",
-    type: "outreach",
-    title: "Regional Outreach",
-    summary: "GX ministry presence in Maysville, Kentucky during 2025.",
-    prayerFocus: [
-      "Regional impact",
-      "Open hearts",
-      "Sustainable fruit",
-    ],
-    stats: { heardGospel: 210, salvations: 9, healings: 1, testimonies: 3 },
-    media: {
-      cover:
-        "https://upload.wikimedia.org/wikipedia/commons/6/6f/Maysville_Kentucky.jpg",
-    },
-  },
-  {
-    id: "lakeside",
-    city: "Lakeside",
-    country: "United States",
-    region: "North America",
-    lat: 48.0194,
-    lng: -114.2223,
-    year: 2025,
-    status: "recent",
-    type: "outreach",
-    title: "Montana Outreach",
-    summary: "GX ministry presence in Lakeside, Montana during 2025.",
-    prayerFocus: [
-      "Regional witness",
-      "Kingdom impact",
-      "Strong testimony",
-    ],
-    stats: { heardGospel: 180, salvations: 7, healings: 0, testimonies: 2 },
-    media: {
-      cover:
-        "https://upload.wikimedia.org/wikipedia/commons/6/68/Flathead_Lake_Montana.jpg",
-    },
-  },
-  {
-    id: "faroe-islands",
-    city: "Faroe Islands",
-    country: "Faroe Islands",
-    region: "Europe",
-    lat: 62.01,
-    lng: -6.77,
-    year: 2024,
-    status: "historic",
-    type: "outreach",
-    title: "International Mission Presence",
-    summary:
-      "GX reached the Faroe Islands in 2024 as part of its international movement.",
-    prayerFocus: [
-      "Open hearts",
-      "Long-term fruit",
-      "Gospel witness",
-    ],
-    stats: { heardGospel: 120, salvations: 5, healings: 0, testimonies: 2 },
-    media: {
-      cover:
-        "https://upload.wikimedia.org/wikipedia/commons/9/99/Faroe_Islands_landscape.jpg",
-    },
-  },
-];
-
-const filters = [
+const FILTERS = [
   { id: "all", label: "All" },
   { id: "live", label: "Live" },
   { id: "2026", label: "2026" },
   { id: "2025", label: "2025" },
   { id: "2024", label: "2024" },
-];
-
-const testimonials = [
-  {
-    quote:
-      "We saw hearts opening in simple street conversations and people responding to the love of Jesus.",
-    place: "California Outreach",
-  },
-  {
-    quote:
-      "What started as a public presentation became real ministry moments, prayer and bold gospel proclamation.",
-    place: "Newark Microtraining",
-  },
-  {
-    quote:
-      "The Lord keeps moving through creative evangelism, relationships and courageous witness in the nations.",
-    place: "Cape Town",
-  },
-  {
-    quote:
-      "Tirana is not just a point on the map — it is a field where God is actively drawing people right now.",
-    place: "Albania 2026",
-  },
 ];
 
 function getPointColor(status) {
@@ -402,7 +73,7 @@ function useCountUp(target, duration = 1400) {
 }
 
 function CountCard({ label, target }) {
-  const value = useCountUp(target);
+  const value = useCountUp(Number(target || 0));
   return (
     <div className="gx-stat-card">
       <div className="gx-stat-label">{label}</div>
@@ -415,20 +86,23 @@ function MiniMetric({ label, value }) {
   return (
     <div className="gx-mini-metric">
       <div className="gx-mini-label">{label}</div>
-      <div className="gx-mini-value">{value.toLocaleString()}</div>
+      <div className="gx-mini-value">{Number(value || 0).toLocaleString()}</div>
     </div>
   );
 }
 
-function TestimonialSlider() {
+function TestimonialSlider({ testimonials }) {
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
+    if (!testimonials.length) return;
     const timer = setInterval(() => {
       setIndex((prev) => (prev + 1) % testimonials.length);
     }, 5000);
     return () => clearInterval(timer);
-  }, []);
+  }, [testimonials]);
+
+  if (!testimonials.length) return null;
 
   return (
     <div className="gx-testimonial-card">
@@ -444,6 +118,7 @@ function GlobalStyles() {
     <style>{`
       * { box-sizing: border-box; }
       html, body, #root { margin: 0; min-height: 100%; background: #0D0D0D; }
+      body { overflow-x: hidden; }
       button { font: inherit; }
 
       @keyframes gxPulse {
@@ -540,7 +215,6 @@ function GlobalStyles() {
         font-size: clamp(44px, 6vw, 86px);
         line-height: 0.92;
         letter-spacing: -0.065em;
-        white-space: normal;
       }
 
       .gx-hero-line {
@@ -776,7 +450,7 @@ function GlobalStyles() {
 
       .gx-cover {
         width: 100%;
-        height: 250px;
+        height: 320px;
         object-fit: cover;
         border-radius: 22px;
         margin-top: 18px;
@@ -843,7 +517,7 @@ function GlobalStyles() {
         display: grid;
         gap: 10px;
         margin-top: 14px;
-        max-height: 520px;
+        max-height: 560px;
         overflow-y: auto;
         padding-right: 4px;
       }
@@ -968,17 +642,25 @@ function GlobalStyles() {
         }
 
         .gx-hero-title {
-          font-size: clamp(44px, 12vw, 72px);
+          font-size: clamp(42px, 12vw, 72px);
         }
 
         .gx-globe-card {
           min-height: 620px;
         }
+
+        .gx-cover {
+          height: 260px;
+        }
       }
 
       @media (max-width: 720px) {
         .gx-container {
-          width: min(100% - 24px, 1480px);
+          width: min(100% - 20px, 1480px);
+        }
+
+        .gx-hero {
+          padding-top: 34px;
         }
 
         .gx-stats-grid {
@@ -990,7 +672,7 @@ function GlobalStyles() {
         }
 
         .gx-cover {
-          height: 210px;
+          height: 220px;
         }
 
         .gx-location-title,
@@ -1000,11 +682,15 @@ function GlobalStyles() {
 
         .gx-globe-title,
         .gx-bottom-title {
-          font-size: 32px;
+          font-size: 30px;
         }
 
         .gx-testimonial-quote {
-          font-size: 20px;
+          font-size: 19px;
+        }
+
+        .gx-globe-card {
+          min-height: 500px;
         }
       }
 
@@ -1014,8 +700,47 @@ function GlobalStyles() {
           grid-template-columns: 1fr;
         }
 
+        .gx-filter-row {
+          gap: 6px;
+        }
+
+        .gx-filter-btn {
+          padding: 9px 12px;
+          font-size: 13px;
+        }
+
+        .gx-hero-title {
+          font-size: clamp(36px, 12vw, 54px);
+        }
+
+        .gx-hero-text {
+          font-size: 15px;
+          line-height: 1.65;
+        }
+
+        .gx-card-text,
+        .gx-bullet-row {
+          font-size: 14px;
+        }
+
+        .gx-cover {
+          height: 200px;
+        }
+
         .gx-globe-card {
-          min-height: 520px;
+          min-height: 430px;
+        }
+
+        .gx-stat-value {
+          font-size: 28px;
+        }
+
+        .gx-bottom-card,
+        .gx-location-panel,
+        .gx-location-list-card,
+        .gx-hero-card,
+        .gx-testimonial-card {
+          padding: 18px;
         }
       }
     `}</style>
@@ -1024,27 +749,106 @@ function GlobalStyles() {
 
 export default function App() {
   const globeRef = useRef();
+
+  const [locations, setLocations] = useState([]);
+  const [testimonials, setTestimonials] = useState([]);
+  const [globalStats, setGlobalStats] = useState(null);
   const [activeFilter, setActiveFilter] = useState("all");
-  const [selectedId, setSelectedId] = useState("tirana");
+  const [selectedId, setSelectedId] = useState("");
   const [imageSrc, setImageSrc] = useState("");
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const [locationsRes, testimonialsRes, statsRes] = await Promise.all([
+          fetch("/data/locations.json"),
+          fetch("/data/testimonials.json"),
+          fetch("/data/global-stats.json"),
+        ]);
+
+        const [locationsData, testimonialsData, statsData] = await Promise.all([
+          locationsRes.json(),
+          testimonialsRes.json(),
+          statsRes.json(),
+        ]);
+
+        setLocations(Array.isArray(locationsData) ? locationsData : []);
+        setTestimonials(Array.isArray(testimonialsData) ? testimonialsData : []);
+        setGlobalStats(statsData || {});
+
+        if (Array.isArray(locationsData) && locationsData.length) {
+          const tirana = locationsData.find((item) => item.id === "tirana");
+          setSelectedId((tirana || locationsData[0]).id);
+        }
+      } catch (error) {
+        console.error("Failed to load GX data:", error);
+      }
+    }
+
+    loadData();
+  }, []);
 
   const visibleLocations = useMemo(
     () => locations.filter((item) => getFilterMatch(item, activeFilter)),
-    [activeFilter]
+    [locations, activeFilter]
   );
 
-  const selected =
-    locations.find((item) => item.id === selectedId) || locations[0];
+  const selected = useMemo(() => {
+    return locations.find((item) => item.id === selectedId) || locations[0] || null;
+  }, [locations, selectedId]);
 
   useEffect(() => {
-    setImageSrc(selected.media.cover || createFallbackImage(selected.city));
+    if (!selected) return;
+    const cover =
+      selected.media?.cover ||
+      selected.image ||
+      createFallbackImage(selected.city);
+    setImageSrc(cover);
   }, [selected]);
 
+  const computedStats = useMemo(() => {
+    const totalsFromLocations = {
+      trackedLocations: locations.length,
+      liveLocations: locations.filter((item) => item.status === "live").length,
+      peopleHeardGospel: locations.reduce(
+        (sum, item) => sum + Number(item.stats?.heardGospel ?? item.heardGospel ?? 0),
+        0
+      ),
+      peopleSaidYesToJesus: locations.reduce(
+        (sum, item) => sum + Number(item.stats?.salvations ?? item.salvations ?? 0),
+        0
+      ),
+      healingsReported: locations.reduce(
+        (sum, item) => sum + Number(item.stats?.healings ?? item.healings ?? 0),
+        0
+      ),
+      testimoniesLogged: locations.reduce(
+        (sum, item) => sum + Number(item.stats?.testimonies ?? item.testimonies ?? 0),
+        0
+      ),
+    };
+
+    return {
+      trackedLocations:
+        globalStats?.trackedLocations ?? totalsFromLocations.trackedLocations,
+      liveLocations:
+        globalStats?.liveLocations ?? totalsFromLocations.liveLocations,
+      peopleHeardGospel:
+        globalStats?.peopleHeardGospel ?? globalStats?.heardGospel ?? totalsFromLocations.peopleHeardGospel,
+      peopleSaidYesToJesus:
+        globalStats?.peopleSaidYesToJesus ?? globalStats?.salvations ?? totalsFromLocations.peopleSaidYesToJesus,
+      healingsReported:
+        globalStats?.healingsReported ?? globalStats?.healings ?? totalsFromLocations.healingsReported,
+      testimoniesLogged:
+        globalStats?.testimoniesLogged ?? globalStats?.testimonies ?? totalsFromLocations.testimoniesLogged,
+    };
+  }, [locations, globalStats]);
+
   const arcsData = useMemo(() => {
-    const kc = locations.find((item) => item.id === "kansas-city");
+    const kc = locations.find((item) => item.id === "kansascity" || item.id === "kansas-city");
     if (!kc) return [];
     return locations
-      .filter((item) => item.id !== "kansas-city")
+      .filter((item) => item.id !== kc.id)
       .map((item) => ({
         startLat: kc.lat,
         startLng: kc.lng,
@@ -1052,21 +856,10 @@ export default function App() {
         endLng: item.lng,
         color: [GX.orange, GX.orange],
       }));
-  }, []);
-
-  const totals = useMemo(() => {
-    return {
-      locations: locations.length,
-      liveNow: locations.filter((item) => item.status === "live").length,
-      heardGospel: locations.reduce((sum, item) => sum + item.stats.heardGospel, 0),
-      salvations: locations.reduce((sum, item) => sum + item.stats.salvations, 0),
-      healings: locations.reduce((sum, item) => sum + item.stats.healings, 0),
-      testimonies: locations.reduce((sum, item) => sum + item.stats.testimonies, 0),
-    };
-  }, []);
+  }, [locations]);
 
   useEffect(() => {
-    if (!globeRef.current) return;
+    if (!globeRef.current || !locations.length) return;
 
     globeRef.current.pointOfView({ lat: 18, lng: 0, altitude: 1.8 }, 0);
     globeRef.current.controls().autoRotate = true;
@@ -1074,18 +867,35 @@ export default function App() {
     globeRef.current.controls().enablePan = false;
     globeRef.current.controls().minDistance = 180;
     globeRef.current.controls().maxDistance = 420;
-  }, []);
+  }, [locations]);
 
   const focusLocation = (location) => {
+    if (!location) return;
     setSelectedId(location.id);
 
     if (!globeRef.current) return;
-
     globeRef.current.pointOfView(
       { lat: location.lat, lng: location.lng, altitude: 1.22 },
       1400
     );
   };
+
+  if (!selected && !locations.length) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          background: GX.black,
+          color: GX.offWhite,
+          display: "grid",
+          placeItems: "center",
+          fontFamily: "Inter, sans-serif",
+        }}
+      >
+        Loading GX Global Map...
+      </div>
+    );
+  }
 
   return (
     <div className="gx-page">
@@ -1130,37 +940,51 @@ export default function App() {
             </div>
           </div>
 
-          <div className="gx-hero-card">
-            <div className="gx-eyebrow">LIVE FOCUS</div>
-            <h3 className="gx-card-title">{selected.city}</h3>
-            <p className="gx-card-sub">
-              {selected.country} · {selected.region}
-            </p>
-            <p className="gx-card-text">{selected.summary}</p>
+          {selected && (
+            <div className="gx-hero-card">
+              <div className="gx-eyebrow">LIVE FOCUS</div>
+              <h3 className="gx-card-title">{selected.city}</h3>
+              <p className="gx-card-sub">
+                {selected.country} · {selected.region}
+              </p>
+              <p className="gx-card-text">{selected.summary}</p>
 
-            <div className="gx-tag-row">
-              <span className="gx-tag">{selected.year}</span>
-              <span className="gx-tag">{selected.type}</span>
-              <span className="gx-tag">
-                {selected.status === "live" ? "Live Now" : selected.status}
-              </span>
+              <div className="gx-tag-row">
+                <span className="gx-tag">{selected.year}</span>
+                <span className="gx-tag">{selected.type}</span>
+                <span className="gx-tag">
+                  {selected.status === "live" ? "Live Now" : selected.status}
+                </span>
+              </div>
             </div>
-          </div>
+          )}
         </section>
 
         <section className="gx-stats">
           <div className="gx-stats-grid">
-            <CountCard label="Tracked Locations" target={totals.locations} />
-            <CountCard label="Live Locations" target={totals.liveNow} />
-            <CountCard label="People Heard Gospel" target={totals.heardGospel} />
+            <CountCard
+              label="Tracked Locations"
+              target={computedStats.trackedLocations}
+            />
+            <CountCard
+              label="Live Locations"
+              target={computedStats.liveLocations}
+            />
+            <CountCard
+              label="People Heard Gospel"
+              target={computedStats.peopleHeardGospel}
+            />
             <CountCard
               label="People Said Yes to Jesus"
-              target={totals.salvations}
+              target={computedStats.peopleSaidYesToJesus}
             />
-            <CountCard label="Healings Reported" target={totals.healings} />
+            <CountCard
+              label="Healings Reported"
+              target={computedStats.healingsReported}
+            />
             <CountCard
               label="Testimonies Logged"
-              target={totals.testimonies}
+              target={computedStats.testimoniesLogged}
             />
           </div>
         </section>
@@ -1177,7 +1001,7 @@ export default function App() {
             </div>
 
             <div className="gx-filter-row">
-              {filters.map((filter) => (
+              {FILTERS.map((filter) => (
                 <button
                   key={filter.id}
                   onClick={() => setActiveFilter(filter.id)}
@@ -1225,93 +1049,103 @@ export default function App() {
             />
           </div>
 
-          <div className="gx-location-section">
-            <div className="gx-location-panel">
-              <div className="gx-eyebrow">SELECTED LOCATION</div>
-              <h3 className="gx-location-title">{selected.city}</h3>
-              <p className="gx-location-sub">
-                {selected.country} · {selected.region}
-              </p>
+          {selected && (
+            <div className="gx-location-section">
+              <div className="gx-location-panel">
+                <div className="gx-eyebrow">SELECTED LOCATION</div>
+                <h3 className="gx-location-title">{selected.city}</h3>
+                <p className="gx-location-sub">
+                  {selected.country} · {selected.region}
+                </p>
 
-              <img
-                src={imageSrc}
-                alt={selected.city}
-                className="gx-cover"
-                onError={() => setImageSrc(createFallbackImage(selected.city))}
-              />
-
-              <div className="gx-tag-row">
-                <span className="gx-tag">{selected.year}</span>
-                <span className="gx-tag">{selected.type}</span>
-                <span className="gx-tag">
-                  {selected.status === "live" ? "Live Now" : selected.status}
-                </span>
-              </div>
-
-              <p className="gx-card-text">{selected.summary}</p>
-
-              <div className="gx-metrics-grid">
-                <MiniMetric
-                  label="Heard Gospel"
-                  value={selected.stats.heardGospel}
+                <img
+                  src={imageSrc}
+                  alt={selected.city}
+                  className="gx-cover"
+                  onError={() => setImageSrc(createFallbackImage(selected.city))}
                 />
-                <MiniMetric label="Salvations" value={selected.stats.salvations} />
-                <MiniMetric label="Healings" value={selected.stats.healings} />
-                <MiniMetric
-                  label="Testimonies"
-                  value={selected.stats.testimonies}
-                />
-              </div>
 
-              <div className="gx-section-block">
-                <div className="gx-eyebrow">PRAYER FOCUS</div>
-                <div className="gx-bullet-list">
-                  {selected.prayerFocus.map((item) => (
-                    <div key={item} className="gx-bullet-row">
-                      <span className="gx-bullet-dot"></span>
-                      <span>{item}</span>
+                <div className="gx-tag-row">
+                  <span className="gx-tag">{selected.year}</span>
+                  <span className="gx-tag">{selected.type}</span>
+                  <span className="gx-tag">
+                    {selected.status === "live" ? "Live Now" : selected.status}
+                  </span>
+                </div>
+
+                <p className="gx-card-text">{selected.summary}</p>
+
+                <div className="gx-metrics-grid">
+                  <MiniMetric
+                    label="Heard Gospel"
+                    value={selected.stats?.heardGospel ?? selected.heardGospel ?? 0}
+                  />
+                  <MiniMetric
+                    label="Salvations"
+                    value={selected.stats?.salvations ?? selected.salvations ?? 0}
+                  />
+                  <MiniMetric
+                    label="Healings"
+                    value={selected.stats?.healings ?? selected.healings ?? 0}
+                  />
+                  <MiniMetric
+                    label="Testimonies"
+                    value={selected.stats?.testimonies ?? selected.testimonies ?? 0}
+                  />
+                </div>
+
+                {selected.prayerFocus?.length > 0 && (
+                  <div className="gx-section-block">
+                    <div className="gx-eyebrow">PRAYER FOCUS</div>
+                    <div className="gx-bullet-list">
+                      {selected.prayerFocus.map((item) => (
+                        <div key={item} className="gx-bullet-row">
+                          <span className="gx-bullet-dot"></span>
+                          <span>{item}</span>
+                        </div>
+                      ))}
                     </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="gx-location-list-card">
+                <div className="gx-eyebrow">LOCATIONS</div>
+                <div className="gx-location-list">
+                  {visibleLocations.map((item) => (
+                    <button
+                      key={item.id}
+                      onClick={() => focusLocation(item)}
+                      className={`gx-location-btn ${
+                        selected.id === item.id ? "active" : ""
+                      }`}
+                    >
+                      <div>
+                        <div className="gx-location-name">{item.city}</div>
+                        <div className="gx-location-meta">
+                          {item.country} · {item.year}
+                        </div>
+                      </div>
+                      <span
+                        className="gx-location-dot"
+                        style={{
+                          background:
+                            item.status === "live"
+                              ? GX.live
+                              : item.status === "recent"
+                              ? GX.offWhite
+                              : GX.historic,
+                        }}
+                      ></span>
+                    </button>
                   ))}
                 </div>
               </div>
             </div>
-
-            <div className="gx-location-list-card">
-              <div className="gx-eyebrow">LOCATIONS</div>
-              <div className="gx-location-list">
-                {visibleLocations.map((item) => (
-                  <button
-                    key={item.id}
-                    onClick={() => focusLocation(item)}
-                    className={`gx-location-btn ${
-                      selected.id === item.id ? "active" : ""
-                    }`}
-                  >
-                    <div>
-                      <div className="gx-location-name">{item.city}</div>
-                      <div className="gx-location-meta">
-                        {item.country} · {item.year}
-                      </div>
-                    </div>
-                    <span
-                      className="gx-location-dot"
-                      style={{
-                        background:
-                          item.status === "live"
-                            ? GX.live
-                            : item.status === "recent"
-                            ? GX.offWhite
-                            : GX.historic,
-                      }}
-                    ></span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
+          )}
 
           <div className="gx-testimonial-wrap">
-            <TestimonialSlider />
+            <TestimonialSlider testimonials={testimonials} />
           </div>
         </section>
 
